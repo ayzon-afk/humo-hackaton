@@ -33,6 +33,12 @@ export const config = {
     collection: env.AGENT_COLLECTION || (env.COLLECTIONS || 'items').split(',')[0].trim(),
     telegram: { token: env.TELEGRAM_BOT_TOKEN || '', chatId: env.TELEGRAM_CHAT_ID || '' },
   },
+  operator: {
+    name: env.OPERATOR_NAME || 'AI-управляющий',
+    startBalance: Number(env.OPERATOR_BALANCE) || 20_000_000, // демо-счёт бизнеса
+    maxAmount: Number(env.OPERATOR_MAX_AMOUNT) || 5_000_000, // лимит одного действия AI
+    currency: env.OPERATOR_CURRENCY || 'сум',
+  },
   paths: {
     dataFile: env.DATA_FILE || path.join(serverRoot, 'data', 'db.json'),
     uploadsDir: path.join(serverRoot, 'uploads'),

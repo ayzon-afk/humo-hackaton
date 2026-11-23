@@ -2,6 +2,7 @@ import { config } from '../config.js';
 import { emit } from '../realtime/socket.js';
 import { buildReport, listReports, snapshot } from './reporter.js';
 import { notifyAlert, notifyReport } from './notify.js';
+import { scanInventory } from '../operator/watcher.js';
 
 const state = { nextReportAt: null, lastCheckAt: null, seenAlerts: new Set(), timers: [] };
 
@@ -47,6 +48,8 @@ async function checkAlerts() {
   // алерт, который исчез, снова сможет сработать в будущем
   const active = new Set(alerts.map((a) => a.key));
   [...state.seenAlerts].filter((k) => !active.has(k)).forEach((k) => state.seenAlerts.delete(k));
+  // склад: товар заканчивается → AI-управляющий готовит заказ и звонит владельцу
+  await scanInventory();
 }
 
 export function startAgent() {

@@ -3,7 +3,7 @@ import { config } from '../config.js';
 const LEVEL_ICON = { critical: '🔴', warning: '🟠', info: '🔵' };
 
 /** Отправка в Telegram, если заданы TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID. Ошибки не роняют агента. */
-async function sendTelegram(text) {
+export async function sendTelegram(text) {
   const { token, chatId } = config.agent.telegram;
   if (!token || !chatId) return false;
   try {

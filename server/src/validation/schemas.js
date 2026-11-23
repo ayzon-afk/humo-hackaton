@@ -50,3 +50,16 @@ export const aiAnalyzeSchema = z.object({
   text: z.string().trim().min(1, 'Нужен text').max(4000),
   instruction: z.string().max(2000).optional(),
 });
+
+// AI-управляющий
+export const operatorCommandSchema = z.object({
+  text: z.string().trim().min(1, 'Скажите или напишите команду').max(1000),
+});
+
+export const proposalDecisionSchema = z.object({
+  comment: z.string().trim().max(300).optional(),
+});
+
+export const demoSaleSchema = z.object({
+  productId: z.string().trim().max(64).optional(),
+});

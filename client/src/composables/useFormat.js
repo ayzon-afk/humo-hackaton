@@ -1,4 +1,9 @@
 /** Форматирование дат и чисел в одном месте — одинаково на всех страницах */
+import { categoryLabels, statusLabels } from '@/config/labels';
+
+/** Ключи статусов и категорий в тексте сервера («done», «city») → человеческие названия */
+export const humanizeKeys = (text = '') =>
+  text.replace(/«([^»]+)»/g, (_, key) => `«${statusLabels[key] || categoryLabels[key] || key}»`);
 
 export const formatDate = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 

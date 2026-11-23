@@ -14,6 +14,7 @@
 
 - **CRM-система** — обзор с трендами, таблица с фильтрами и поиском, карточка записи с историей изменений, карта, команда и роли, настройки
 - **AI-агент** — круглосуточно следит за данными, поднимает тревоги и каждый день сам присылает отчёт руководителю (в CRM и Telegram)
+- **AI-управляющий** — замечает проблему (товар заканчивается), «звонит» владельцу, голосом спрашивает «Заказать?» и после «да» сам выполняет действие. Голосовые команды, брифинг, журнал решений, лимит трат
 - **AI** — автозаполнение формы по описанию, анализ записи, чат-ассистент. Без ключа работает в демо-режиме и не падает
 - **Реальное время** — изменения появляются у всех пользователей мгновенно (WebSocket)
 - **Сайт** — лендинг со scroll-историей: прокрутка перематывает сцены работы продукта
@@ -67,15 +68,17 @@ GET  /api/:collection?status=new&q=текст&limit=10&sort=-createdAt
 GET|PATCH|DELETE /api/:collection/:id             POST /api/:collection
 GET  /api/stats/:collection
 GET  /api/agent/status | /api/agent/reports      POST /api/agent/run
+GET  /api/operator/state | /api/operator/briefing POST /api/operator/command
+POST /api/operator/proposals/:id/confirm | reject  POST /api/operator/demo/sale
 POST /api/ai/chat | /api/ai/analyze | /api/ai/vision
 POST /api/upload                                  GET /api/health
 ```
 
-WebSocket: `<collection>:created | updated | deleted`, `agent:report`, `agent:alert`
+WebSocket: `<collection>:created | updated | deleted`, `agent:report`, `agent:alert`, `operator:proposal | resolved`, `inventory:updated`
 
 ## Документация
 
 - [Архитектура](docs/ARCHITECTURE.md)
 - [Задача хакатона](kit/00-task/TASK.md) · [Всё о проекте — kit/](kit/README.md)
 - [Стиль CRM](kit/02-design/STYLE_CRM.md) · [Стиль сайта](kit/02-design/STYLE_WEBSITE.md)
-- [AI-агент](kit/05-ai-agent/AI_AGENT.md) · [Правила кода](kit/06-code-rules/CODE_RULES.md) · [Питч](kit/08-pitch/PITCH.md)
+- [AI-агент](kit/05-ai-agent/AI_AGENT.md) · [AI-управляющий](kit/05-ai-agent/AI_OPERATOR.md) · [Правила кода](kit/06-code-rules/CODE_RULES.md) · [Питч](kit/08-pitch/PITCH.md)

@@ -27,18 +27,19 @@ Vue 3 (Composition API, `<script setup>`) + Vite + Pinia + Vue Router + Tailwind
 
 ## Где что лежит
 
-| Что                                       | Где                                               |
-| ----------------------------------------- | ------------------------------------------------- |
-| Тема, задача, план дня                    | `kit/00-task/`                                    |
-| Дизайн-система, правила CRM и сайта       | `kit/02-design/` + `client/src/styles/tokens.css` |
-| Описание всех страниц системы             | `kit/03-system/SYSTEM.md`                         |
-| Описание сайта и scroll-истории           | `kit/04-site/SITE.md`                             |
-| AI-агент (мониторинг + ежедневные отчёты) | `kit/05-ai-agent/` + `server/src/agent/`          |
-| Правила кода для AI-проверки              | `kit/06-code-rules/CODE_RULES.md`                 |
-| Демо-данные                               | `kit/07-data/DATA.md` + `server/src/db/seed.js`   |
-| Питч                                      | `kit/08-pitch/PITCH.md`                           |
-| Готовые промпты по этапам                 | `kit/09-claude-prompts/PROMPTS.md`                |
-| Архитектура                               | `docs/ARCHITECTURE.md`                            |
+| Что                                       | Где                                                       |
+| ----------------------------------------- | --------------------------------------------------------- |
+| Тема, задача, план дня                    | `kit/00-task/`                                            |
+| Дизайн-система, правила CRM и сайта       | `kit/02-design/` + `client/src/styles/tokens.css`         |
+| Описание всех страниц системы             | `kit/03-system/SYSTEM.md`                                 |
+| Описание сайта и scroll-истории           | `kit/04-site/SITE.md`                                     |
+| AI-агент (мониторинг + ежедневные отчёты) | `kit/05-ai-agent/` + `server/src/agent/`                  |
+| AI-управляющий (голос, звонки, действия)  | `kit/05-ai-agent/AI_OPERATOR.md` + `server/src/operator/` |
+| Правила кода для AI-проверки              | `kit/06-code-rules/CODE_RULES.md`                         |
+| Демо-данные                               | `kit/07-data/DATA.md` + `server/src/db/seed.js`           |
+| Питч                                      | `kit/08-pitch/PITCH.md`                                   |
+| Готовые промпты по этапам                 | `kit/09-claude-prompts/PROMPTS.md`                        |
+| Архитектура                               | `docs/ARCHITECTURE.md`                                    |
 
 ## Правила, которые нельзя нарушать
 

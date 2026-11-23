@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { collection } from './store.js';
 import { config } from '../config.js';
+import { DEMO_STOCK } from './demoStock.js';
+import { resetWallet } from '../operator/wallet.js';
 
 const CENTER = [41.3111, 69.2797]; // Ташкент
 const CATEGORIES = ['transport', 'ecology', 'education', 'health', 'city'];
@@ -72,6 +74,15 @@ export function ensureSeed({ reset = false } = {}) {
     if (reset) collection('reports').clear();
     if (col.count() === 0) demoItems().forEach((item) => col.insert(item));
   }
+
+  // AI-управляющий: склад, счёт, журнал решений
+  const stock = collection('inventory');
+  if (reset) {
+    stock.clear();
+    ['proposals', 'orders'].forEach((name) => collection(name).clear());
+    resetWallet();
+  }
+  if (stock.count() === 0) DEMO_STOCK.forEach((item) => stock.insert(item));
 }
 
 if (process.argv.includes('--reset')) {

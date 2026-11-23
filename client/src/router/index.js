@@ -15,6 +15,7 @@ const routes = [
       { path: 'items/:id', component: () => import('@/views/ItemDetailView.vue'), props: true },
       { path: 'map', component: () => import('@/views/MapPageView.vue') },
       { path: 'agent', component: () => import('@/views/AgentView.vue') },
+      { path: 'operator', component: () => import('@/views/OperatorView.vue') },
       { path: 'ai', component: () => import('@/views/AiView.vue') },
       { path: 'team', component: () => import('@/views/TeamView.vue') },
       { path: 'settings', component: () => import('@/views/SettingsView.vue') },

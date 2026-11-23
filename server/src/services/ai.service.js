@@ -5,7 +5,8 @@ import { config } from '../config.js';
 
 export const aiEnabled = () => Boolean(config.ai.baseUrl && config.ai.apiKey && config.ai.model);
 
-async function callModel({ messages, model = config.ai.model, json = false }) {
+/** Запрос к модели. Возвращает message целиком: в нём content и, если были tools, tool_calls. */
+async function callModel({ messages, model = config.ai.model, json = false, tools }) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), config.ai.timeoutMs);
   try {
@@ -21,11 +22,12 @@ async function callModel({ messages, model = config.ai.model, json = false }) {
         messages,
         temperature: 0.4,
         ...(json ? { response_format: { type: 'json_object' } } : {}),
+        ...(tools?.length ? { tools } : {}),
       }),
     });
     if (!res.ok) throw new Error(`AI ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const data = await res.json();
-    return data.choices?.[0]?.message?.content ?? '';
+    return data.choices?.[0]?.message ?? {};
   } finally {
     clearTimeout(timer);
   }
@@ -58,7 +60,9 @@ export function chat({
   system = 'Ты полезный ассистент. Отвечай кратко и по делу на языке пользователя.',
 }) {
   return safely(
-    async () => ({ reply: await callModel({ messages: [{ role: 'system', content: system }, ...messages] }) }),
+    async () => ({
+      reply: (await callModel({ messages: [{ role: 'system', content: system }, ...messages] })).content ?? '',
+    }),
     { reply: 'DEMO: AI-ключ не задан. Добавь AI_API_KEY в server/.env — и здесь будет реальный ответ.' },
   );
 }
@@ -69,13 +73,15 @@ export function analyze({ text, instruction }) {
   return safely(
     async () => ({
       result: parseJson(
-        await callModel({
-          json: true,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: text },
-          ],
-        }),
+        (
+          await callModel({
+            json: true,
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: text },
+            ],
+          })
+        ).content ?? '',
       ),
     }),
     { result: { category: 'city', priority: 3, summary: String(text || '').slice(0, 120), tags: ['demo'] } },
@@ -88,20 +94,46 @@ export function vision({ imageBase64, mimeType = 'image/jpeg', prompt }) {
   return safely(
     async () => ({
       result: parseJson(
-        await callModel({
-          model: config.ai.visionModel,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: instruction },
-                { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
-              ],
-            },
-          ],
-        }),
+        (
+          await callModel({
+            model: config.ai.visionModel,
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  { type: 'text', text: instruction },
+                  { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
+                ],
+              },
+            ],
+          })
+        ).content ?? '',
       ),
     }),
     { result: { label: 'demo', confidence: 0.9, description: 'DEMO: подключи vision-модель в .env' } },
   );
+}
+
+function parseArgs(raw) {
+  if (raw && typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw || '{}');
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Диалог с инструментами: модель может попросить вызвать функцию (tools в формате OpenAI).
+ * Без ключа бросает ошибку — запасной путь выбирает вызывающий код.
+ * @returns {Promise<{ content: string, toolCalls: { name: string, args: object }[] }>}
+ */
+export async function chatWithTools({ messages, tools }) {
+  if (!aiEnabled()) throw new Error('AI не подключён');
+  const message = await callModel({ messages, tools });
+  const toolCalls = (message.tool_calls ?? []).map((call) => ({
+    name: call.function?.name,
+    args: parseArgs(call.function?.arguments),
+  }));
+  return { content: message.content ?? '', toolCalls };
 }

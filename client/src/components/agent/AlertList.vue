@@ -1,14 +1,11 @@
 <script setup>
 import { CircleAlert, Info, TriangleAlert } from 'lucide-vue-next';
-import { categoryLabels } from '@/config/labels';
+import { humanizeKeys as humanize } from '@/composables/useFormat';
 
 defineProps({ alerts: { type: Array, default: () => [] } });
 
 const ICONS = { critical: CircleAlert, warning: TriangleAlert, info: Info };
 const TONES = { critical: 'danger', warning: 'warning', info: 'info' };
-
-/** Ключи категорий в тексте алерта → человеческие названия */
-const humanize = (text) => text.replace(/«([^»]+)»/g, (_, key) => `«${categoryLabels[key] || key}»`);
 </script>
 
 <template>

@@ -3,6 +3,7 @@ import { config } from '../config.js';
 import { analyze } from '../services/ai.service.js';
 import { computeMetrics } from './metrics.js';
 import { detectAlerts } from './rules.js';
+import { stockAlert } from '../operator/inventory.js';
 
 const KEEP_REPORTS = 30;
 
@@ -10,7 +11,7 @@ const KEEP_REPORTS = 30;
 export function snapshot(now = Date.now()) {
   const { collection: name, doneStatus, staleHours } = config.agent;
   const metrics = computeMetrics(collection(name).all(), { now, doneStatus, staleHours });
-  return { metrics, alerts: detectAlerts(metrics) };
+  return { metrics, alerts: [stockAlert(), ...detectAlerts(metrics)].filter(Boolean) };
 }
 
 /** Какое действие предложить по каждой тревоге (когда AI недоступен) */
@@ -20,6 +21,7 @@ const ACTIONS = {
   spike: 'Выясните причину роста новых записей — возможна массовая проблема',
   'low-resolution': 'Сначала закрывайте старые записи, потом берите новые',
   hot: 'Выделите отдельного ответственного на проблемную категорию',
+  'low-stock': 'Подтвердите заказ товаров, которые заканчиваются — AI-управляющий уже подготовил его',
 };
 const DEFAULT_ACTIONS = [
   'Разберите новые записи до обеда',

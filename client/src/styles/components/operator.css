@@ -1,0 +1,158 @@
+/* AI-управляющий: голосовая консоль и «входящий звонок» */
+.chat.voice {
+  height: min(62vh, 600px);
+}
+.mic {
+  width: var(--control-h);
+  padding: 0;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mic.live {
+  animation: mic-live 1.2s var(--ease) infinite;
+}
+@keyframes mic-live {
+  50% {
+    transform: scale(1.08);
+  }
+}
+.voice-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-4) var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.voice-confirm span {
+  flex: 1;
+}
+
+.bar.low > span {
+  background: var(--danger);
+}
+.proposal-row {
+  align-items: flex-start;
+}
+
+/* Входящий звонок */
+.call-scrim {
+  display: grid;
+  place-items: center;
+}
+.call {
+  width: min(380px, calc(100vw - 32px));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-10) var(--space-6) var(--space-8);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-pop);
+  text-align: center;
+}
+.call-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.call-avatar svg {
+  width: 40px;
+  height: 40px;
+  stroke-width: 1.5;
+}
+.call-avatar.ringing::after,
+.call-avatar.live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  z-index: -1;
+  animation: agent-ping 1.6s var(--ease-out) infinite;
+}
+.call-who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.call-who .eyebrow-sm {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent);
+}
+.call-text {
+  font-size: var(--fs-lg);
+  line-height: 1.4;
+}
+.call-amount {
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+}
+.call-heard {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+.call-result {
+  white-space: normal;
+  justify-content: center;
+}
+.call-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-2);
+}
+.call-btn {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--on-accent);
+  transition:
+    transform var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+}
+.call-btn svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.75;
+}
+.call-btn:active {
+  transform: scale(0.94);
+}
+.call-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.call-btn.accept {
+  background: var(--success);
+}
+.call-btn.decline {
+  background: var(--danger);
+}
+.call-btn.neutral {
+  background: var(--surface-active);
+  color: var(--text);
+}
+@media (max-width: 640px) {
+  .call {
+    width: 100vw;
+    min-height: 100svh;
+    border-radius: 0;
+    justify-content: center;
+  }
+}
