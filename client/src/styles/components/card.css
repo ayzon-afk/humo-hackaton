@@ -32,6 +32,6 @@
 .list-row:hover { background: var(--surface-hover); }
 
 /* Прогресс-бар для разбивок */
-.bar { height: 4px; border-radius: 2px; background: var(--surface-active); overflow: hidden; }
-.bar > span { display: block; height: 100%; border-radius: 2px; background: var(--text-tertiary); transition: width var(--dur-slow) var(--ease-out); }
+.bar { height: 6px; border-radius: 3px; background: var(--accent-soft); overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 3px; background: var(--accent); transition: width var(--dur-slow) var(--ease-out); }
 .bar.accent > span { background: var(--accent); }

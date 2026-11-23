@@ -1,15 +1,40 @@
-/* Боковая панель (sheet) — создание/редактирование без ухода со страницы */
-.sheet-scrim { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.18); }
+/* Панель справа (sheet): компактная, по высоте контента */
+.sheet-scrim { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.22); }
 .sheet {
-  position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 51;
-  width: min(440px, calc(100vw - 24px)); display: flex; flex-direction: column;
+  position: fixed; top: 16px; right: 16px; z-index: 51;
+  width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 32px);
+  display: flex; flex-direction: column;
   background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-pop);
+  overflow: hidden;
 }
-.sheet-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--hairline); }
-.sheet-body { flex: 1; overflow-y: auto; padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-5); }
-.sheet-footer { display: flex; justify-content: flex-end; gap: var(--space-2); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--hairline); }
+.sheet-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); padding: var(--space-6) var(--space-6) var(--space-2); }
+.sheet-header .eyebrow-sm { font-size: var(--fs-xs); font-weight: 600; color: var(--accent); letter-spacing: 0; }
+.sheet-body { overflow-y: auto; padding: var(--space-4) var(--space-6) var(--space-6); display: flex; flex-direction: column; gap: var(--space-6); }
+.sheet-footer { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--hairline); background: var(--surface-muted); }
+.sheet-footer .btn-primary { flex: 1; height: 44px; font-size: var(--fs-base); border-radius: 12px; }
+
+/* Крупное поле названия (как в Apple Notes/Reminders) */
+.title-input {
+  width: 100%; border: 0; border-bottom: 1px solid var(--hairline); padding: 4px 0 12px;
+  background: transparent; color: var(--text); font: inherit;
+  font-size: var(--fs-xl); font-weight: 600; letter-spacing: var(--tracking-tight);
+  transition: border-color var(--dur) var(--ease);
+}
+.title-input::placeholder { color: var(--text-disabled); }
+.title-input:focus { outline: none; border-bottom-color: var(--accent); }
+
+/* Блок с AI-кнопкой */
+.ai-assist { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: 14px; background: var(--accent-soft); }
+.ai-assist p { flex: 1; font-size: var(--fs-xs); color: var(--accent-text); line-height: 1.4; }
+.ai-assist .btn { background: var(--accent); color: var(--on-accent); }
+.ai-assist .btn:hover { background: var(--accent-hover); }
+
+.point-row { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); color: var(--text-secondary); }
+.point-row svg { width: 16px; height: 16px; color: var(--accent); }
+.kbd { font-size: 11px; color: var(--text-tertiary); border: 1px solid var(--hairline-strong); border-radius: 5px; padding: 1px 5px; font-family: var(--font); }
 
 .sheet-enter-active, .sheet-leave-active { transition: opacity var(--dur) var(--ease); }
-.sheet-enter-active .sheet, .sheet-leave-active .sheet { transition: transform var(--dur-slow) var(--ease-out); }
+.sheet-enter-active .sheet, .sheet-leave-active .sheet { transition: transform var(--dur-slow) var(--ease-out), opacity var(--dur) var(--ease); }
 .sheet-enter-from, .sheet-leave-to { opacity: 0; }
-.sheet-enter-from .sheet, .sheet-leave-to .sheet { transform: translateX(24px); }
+.sheet-enter-from .sheet, .sheet-leave-to .sheet { transform: translateX(32px) scale(0.98); opacity: 0; }
+.title-input:focus-visible { box-shadow: none; border-radius: 0; }

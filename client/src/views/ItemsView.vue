@@ -82,12 +82,12 @@ onMounted(() => {
 
 <template>
   <div>
-    <PageHeader title="Записи" :subtitle="`${items.length} всего`">
+    <PageHeader title="Записи">
       <button class="btn btn-primary" @click="sheetOpen = true"><Plus aria-hidden="true" />Новая запись</button>
     </PageHeader>
 
     <div class="toolbar">
-      <SegmentedControl v-model="status" :options="filters" />
+      <SegmentedControl v-model="status" :options="filters" label="Фильтр по статусу" />
       <div class="flex-1" />
       <SearchField v-model="q" class="w-full sm:w-64" placeholder="Найти запись" />
     </div>
@@ -105,11 +105,13 @@ onMounted(() => {
       <ItemTable v-else :items="visible" :fresh-ids="freshIds" @status="changeStatus" @remove="remove" />
     </section>
 
-    <SheetPanel v-model="sheetOpen" title="Новая запись">
+    <SheetPanel v-model="sheetOpen" title="Новая запись" eyebrow="Записи" @submit="save">
       <ItemForm ref="formRef" />
       <template #footer>
         <button class="btn btn-ghost" @click="sheetOpen = false">Отмена</button>
-        <button class="btn btn-primary" :aria-busy="saving" @click="save"><span v-if="saving" class="spinner" />Добавить</button>
+        <button class="btn btn-primary" :aria-busy="saving" @click="save">
+          <span v-if="saving" class="spinner" />Добавить запись
+        </button>
       </template>
     </SheetPanel>
   </div>

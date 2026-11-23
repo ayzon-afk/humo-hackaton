@@ -25,5 +25,7 @@
 /* Поиск — единственный инпут с иконкой (она функциональная) */
 .search { position: relative; }
 .search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-tertiary); pointer-events: none; }
-.search .input { padding-left: 34px; background: var(--surface-active); border-color: transparent; }
-.search .input:focus { background: var(--surface); }
+.search .input { padding-left: 36px; height: 36px; background: var(--surface); border-color: transparent; box-shadow: var(--shadow-card); border-radius: 11px; }
+.search .input:hover { border-color: transparent; }
+.search .input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
+.search:focus-within svg { color: var(--accent); }

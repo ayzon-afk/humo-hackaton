@@ -5,6 +5,7 @@ import { LogOut } from 'lucide-vue-next';
 import { navLinks } from '@/config/nav';
 import { project } from '@/config/project';
 import { useAuthStore } from '@/stores/auth';
+import ThemeToggle from '@/components/ui/ThemeToggle.vue';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -36,6 +37,7 @@ function logout() {
         <div class="text-sm font-medium truncate">{{ auth.user?.name }}</div>
         <div class="text-xs text-tertiary truncate">{{ auth.user?.email }}</div>
       </div>
+      <ThemeToggle class="btn-sm" />
       <button class="btn btn-ghost btn-icon btn-sm" aria-label="Выйти" title="Выйти" @click="logout">
         <LogOut />
       </button>

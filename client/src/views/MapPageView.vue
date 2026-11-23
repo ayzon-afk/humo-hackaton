@@ -84,11 +84,13 @@ onMounted(() => {
       </aside>
     </div>
 
-    <SheetPanel v-model="sheetOpen" title="Новая запись">
+    <SheetPanel v-model="sheetOpen" title="Новая запись" eyebrow="Точка на карте" @submit="save">
       <ItemForm ref="formRef" :point="picked" />
       <template #footer>
         <button class="btn btn-ghost" @click="sheetOpen = false">Отмена</button>
-        <button class="btn btn-primary" :aria-busy="saving" @click="save"><span v-if="saving" class="spinner" />Добавить</button>
+        <button class="btn btn-primary" :aria-busy="saving" @click="save">
+          <span v-if="saving" class="spinner" />Добавить запись
+        </button>
       </template>
     </SheetPanel>
   </div>
