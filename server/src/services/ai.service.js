@@ -5,7 +5,7 @@ import { config } from '../config.js';
 
 export const aiEnabled = () => Boolean(config.ai.baseUrl && config.ai.apiKey && config.ai.model);
 
-// Перегрузка или лимит у провайдера обычно проходят за секунду — один раз пробуем снова
+// Перегрузка или лимит у провайдера: один раз пробуем снова — на запасной модели, если она задана
 const RETRY_STATUSES = new Set([429, 500, 502, 503]);
 const RETRY_DELAY_MS = 800;
 
@@ -31,8 +31,9 @@ async function callModel({ messages, model = config.ai.model, json = false, tool
     });
     if (!res.ok && attempt === 1 && RETRY_STATUSES.has(res.status)) {
       clearTimeout(timer);
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
-      return callModel({ messages, model, json, tools }, attempt + 1);
+      const fallback = config.ai.fallbackModel && config.ai.fallbackModel !== model ? config.ai.fallbackModel : null;
+      if (!fallback) await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      return callModel({ messages, model: fallback ?? model, json, tools }, attempt + 1);
     }
     if (!res.ok) throw new Error(`AI ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const data = await res.json();

@@ -20,6 +20,7 @@ export const config = {
     baseUrl: (env.AI_BASE_URL || '').replace(/\/$/, ''),
     apiKey: env.AI_API_KEY || '',
     model: env.AI_MODEL || '',
+    fallbackModel: env.AI_FALLBACK_MODEL || '', // запасная модель, если основная перегружена
     visionModel: env.AI_VISION_MODEL || env.AI_MODEL || '',
     timeoutMs: Number(env.AI_TIMEOUT_MS) || 20000,
   },

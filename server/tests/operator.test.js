@@ -141,6 +141,21 @@ describe('operator: с AI-ключом (ответ модели подменён
     expect(body).toMatchObject({ source: 'ai', reply: 'Сводка готова.' });
   });
 
+  it('при перегрузке вторая попытка идёт на запасную модель', async () => {
+    const busy = { ok: false, status: 503, text: async () => 'high demand' };
+    const ok = { ok: true, json: async () => ({ choices: [{ message: { content: 'Готово.' } }] }) };
+    config.ai.fallbackModel = 'lite';
+    try {
+      const models = await withModel([busy, ok], async () => {
+        await command(await adminAuth(), 'Что важно?');
+        return fetch.mock.calls.map(([, init]) => JSON.parse(init.body).model);
+      });
+      expect(models).toEqual(['test', 'lite']);
+    } finally {
+      config.ai.fallbackModel = '';
+    }
+  });
+
   it('модель недоступна → отвечаем по правилам, демо не падает', async () => {
     const down = { ok: false, status: 503, text: async () => 'unavailable' };
     const body = await withModel(down, async () => command(await adminAuth(), 'Закажи 3 сахара'));
