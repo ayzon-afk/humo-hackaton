@@ -1,0 +1,109 @@
+/* ============================================================
+   AYZON DESIGN TOKENS — единый источник цветов, шрифтов, отступов.
+   Используется и в CRM, и на сайте. Меняешь здесь — меняется везде.
+   ============================================================ */
+:root {
+  /* — Акцент: ОДИН цвет. Только главная кнопка, активный пункт, ссылки, фокус — */
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-pressed: #006edb;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --on-accent: #ffffff;
+
+  /* — Поверхности — */
+  --bg: #f5f5f7;            /* фон страницы (Apple gray) */
+  --surface: #ffffff;       /* карточки, таблицы, панели */
+  --surface-muted: #fafafc; /* шапка таблицы, вторичные блоки */
+  --surface-hover: rgba(0, 0, 0, 0.035);
+  --surface-active: rgba(0, 0, 0, 0.06);
+
+  /* — Текст — */
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --text-disabled: #c7c7cc;
+
+  /* — Линии — */
+  --hairline: rgba(0, 0, 0, 0.08);
+  --hairline-strong: rgba(0, 0, 0, 0.14);
+
+  /* — Статусы (только точка/текст, без заливок плашками) — */
+  --success: #34c759;  --success-text: #248a3d;
+  --warning: #ff9f0a;  --warning-text: #b25000;
+  --danger: #ff3b30;   --danger-text: #d70015;
+  --info: var(--accent); --info-text: var(--accent);
+
+  /* — Типографика — */
+  --font: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --fs-xs: 12px;   /* подписи, метаданные */
+  --fs-sm: 13px;   /* вторичный текст, таблица */
+  --fs-base: 15px; /* основной текст */
+  --fs-lg: 17px;   /* заголовок карточки */
+  --fs-xl: 22px;   /* заголовок секции */
+  --fs-2xl: 28px;  /* заголовок страницы */
+  --fs-3xl: 40px;  /* главная цифра */
+  --tracking-tight: -0.022em;
+  --tracking-display: -0.03em;
+
+  /* — Отступы (шаг 4px) — */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* — Радиусы — */
+  --radius-sm: 8px;    /* мелкие элементы */
+  --radius-md: 10px;   /* кнопки, инпуты */
+  --radius-lg: 18px;   /* карточки */
+  --radius-xl: 24px;   /* модальные окна */
+  --radius-pill: 980px;
+
+  /* — Тени: еле заметные — */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-pop: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 48px rgba(0, 0, 0, 0.12);
+  --focus-ring: 0 0 0 4px rgba(0, 113, 227, 0.22);
+
+  /* — Движение — */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+
+  /* — Размеры каркаса — */
+  --sidebar-w: 248px;
+  --topbar-h: 60px;
+  --control-h: 38px;
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --accent: #0a84ff;
+  --accent-hover: #409cff;
+  --accent-pressed: #0071e3;
+  --accent-soft: rgba(10, 132, 255, 0.16);
+
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-muted: #232325;
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface-active: rgba(255, 255, 255, 0.09);
+
+  --text: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #8e8e93;
+  --text-disabled: #48484a;
+
+  --hairline: rgba(255, 255, 255, 0.1);
+  --hairline-strong: rgba(255, 255, 255, 0.18);
+
+  --success: #30d158;  --success-text: #30d158;
+  --warning: #ff9f0a;  --warning-text: #ffb340;
+  --danger: #ff453a;   --danger-text: #ff6961;
+
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 24px 64px rgba(0, 0, 0, 0.6);
+  --focus-ring: 0 0 0 4px rgba(10, 132, 255, 0.35);
+
+  color-scheme: dark;
+}

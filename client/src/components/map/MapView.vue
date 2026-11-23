@@ -2,6 +2,8 @@
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import L from 'leaflet';
 import { project } from '@/config/project';
+import { useTheme } from '@/composables/useTheme';
+import { themeColors } from '@/components/charts/registerCharts';
 
 // points: [{ id, lat, lng, title, color }]
 const props = defineProps({
@@ -13,6 +15,9 @@ const emit = defineEmits(['pick', 'select']);
 const el = ref(null);
 let map = null;
 let layer = null;
+let tiles = null;
+const { theme } = useTheme();
+const TILE = (t) => `https://{s}.basemaps.cartocdn.com/${t === 'dark' ? 'dark_all' : 'light_all'}/{z}/{x}/{y}{r}.png`;
 
 function draw() {
   if (!map) return;
@@ -20,10 +25,10 @@ function draw() {
   for (const p of props.points) {
     if (p.lat == null || p.lng == null) continue;
     L.circleMarker([p.lat, p.lng], {
-      radius: 8,
-      color: p.color || '#38bdf8',
-      fillColor: p.color || '#38bdf8',
-      fillOpacity: 0.7,
+      radius: 7,
+      color: themeColors().surface,
+      fillColor: p.color || themeColors().accent,
+      fillOpacity: 1,
       weight: 2,
     })
       .bindTooltip(p.title || '')
@@ -33,16 +38,19 @@ function draw() {
 }
 
 onMounted(() => {
-  map = L.map(el.value).setView(project.city.center, project.city.zoom);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-  }).addTo(map);
+  map = L.map(el.value, { zoomControl: false }).setView(project.city.center, project.city.zoom);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  tiles = L.tileLayer(TILE(theme.value), { attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
   layer = L.layerGroup().addTo(map);
   map.on('click', (e) => emit('pick', { lat: e.latlng.lat, lng: e.latlng.lng }));
   draw();
 });
 
 watch(() => props.points, draw, { deep: true });
+watch(theme, (t) => {
+  tiles?.setUrl(TILE(t));
+  draw();
+});
 onBeforeUnmount(() => map?.remove());
 </script>
 

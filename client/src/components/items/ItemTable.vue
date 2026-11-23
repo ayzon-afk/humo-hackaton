@@ -1,32 +1,47 @@
 <script setup>
-import { statusLabels, statusBadge, categoryLabels } from '@/config/labels';
+import { Trash2 } from 'lucide-vue-next';
+import { categoryLabels, statusOrder } from '@/config/labels';
+import StatusLabel from '@/components/ui/StatusLabel.vue';
+import PriorityMeter from '@/components/ui/PriorityMeter.vue';
 
-defineProps({ items: { type: Array, default: () => [] } });
+defineProps({
+  items: { type: Array, default: () => [] },
+  freshIds: { type: Set, default: () => new Set() },
+});
 const emit = defineEmits(['status', 'remove']);
 
-const nextStatus = { new: 'in_progress', in_progress: 'done', done: 'new' };
+const next = (s) => statusOrder[(statusOrder.indexOf(s) + 1) % statusOrder.length];
+const date = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 </script>
 
 <template>
-  <div class="overflow-x-auto card bg-base-200">
+  <div class="table-wrap">
     <table class="table">
       <thead>
-        <tr><th>Название</th><th>Категория</th><th>Приоритет</th><th>Статус</th><th /></tr>
+        <tr>
+          <th>Запись</th>
+          <th>Категория</th>
+          <th>Приоритет</th>
+          <th>Статус</th>
+          <th>Дата</th>
+          <th><span class="sr-only">Действия</span></th>
+        </tr>
       </thead>
       <tbody>
-        <tr v-for="item in items" :key="item.id">
+        <tr v-for="item in items" :key="item.id" :class="{ 'row-new': freshIds.has(item.id) }">
           <td>
-            <div class="font-semibold">{{ item.title }}</div>
-            <div class="text-xs opacity-60 line-clamp-1">{{ item.description }}</div>
+            <div class="cell-title">{{ item.title }}</div>
+            <div v-if="item.description" class="cell-sub">{{ item.description }}</div>
           </td>
-          <td>{{ categoryLabels[item.category] || item.category }}</td>
-          <td>{{ '★'.repeat(item.priority || 0) }}</td>
-          <td>
-            <button class="badge cursor-pointer" :class="statusBadge[item.status]" @click="emit('status', item, nextStatus[item.status] || 'new')">
-              {{ statusLabels[item.status] || item.status }}
-            </button>
+          <td class="text-secondary">{{ categoryLabels[item.category] || item.category }}</td>
+          <td><PriorityMeter :value="item.priority || 0" /></td>
+          <td><StatusLabel :status="item.status" interactive @click="emit('status', item, next(item.status))" /></td>
+          <td class="text-tertiary num">{{ date(item.createdAt) }}</td>
+          <td class="text-right">
+            <span class="row-actions">
+              <button class="btn btn-danger btn-icon btn-sm" aria-label="Удалить" title="Удалить" @click="emit('remove', item)"><Trash2 /></button>
+            </span>
           </td>
-          <td><button class="btn btn-ghost btn-xs" @click="emit('remove', item)">✕</button></td>
         </tr>
       </tbody>
     </table>

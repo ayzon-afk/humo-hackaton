@@ -1,13 +1,14 @@
 <script setup>
 import { reactive, ref, watch } from 'vue';
+import { WandSparkles } from 'lucide-vue-next';
 import { aiApi } from '@/api/ai';
 import { categoryLabels } from '@/config/labels';
 
-const props = defineProps({ point: Object }); // { lat, lng } с карты
-const emit = defineEmits(['submit']);
-
+// Форма без кнопки отправки: кнопка живёт в футере панели (SheetPanel)
+const props = defineProps({ point: Object });
 const form = reactive({ title: '', description: '', category: 'city', priority: 3, lat: null, lng: null });
 const aiLoading = ref(false);
+const error = ref('');
 
 watch(
   () => props.point,
@@ -15,9 +16,10 @@ watch(
   { immediate: true },
 );
 
-// Вау-кнопка: AI сам заполняет категорию и приоритет по описанию
+// AI сам определяет категорию, приоритет и название по описанию
 async function autoFill() {
-  if (!form.description) return;
+  if (!form.description.trim()) return (error.value = 'Сначала опиши запись — AI заполнит остальное');
+  error.value = '';
   aiLoading.value = true;
   try {
     const { result } = await aiApi.analyze(
@@ -25,38 +27,64 @@ async function autoFill() {
       `Определи category (одно из: ${Object.keys(categoryLabels).join(', ')}), priority (1-5) и короткий title.`,
     );
     if (result.category in categoryLabels) form.category = result.category;
-    if (result.priority) form.priority = Number(result.priority);
+    if (result.priority) form.priority = Math.min(5, Math.max(1, Number(result.priority)));
     if (result.title && !form.title) form.title = result.title;
   } finally {
     aiLoading.value = false;
   }
 }
 
-function submit() {
-  emit('submit', { ...form });
-  Object.assign(form, { title: '', description: '' });
+function validate() {
+  if (!form.title.trim()) {
+    error.value = 'Добавь название';
+    return null;
+  }
+  return { ...form };
 }
+
+function reset() {
+  Object.assign(form, { title: '', description: '', priority: 3 });
+  error.value = '';
+}
+
+defineExpose({ validate, reset });
 </script>
 
 <template>
-  <form class="card bg-base-200 self-start" @submit.prevent="submit">
-    <div class="card-body gap-3">
-      <h3 class="card-title">Новая запись</h3>
-      <input v-model="form.title" class="input input-bordered w-full" placeholder="Название" required />
-      <textarea v-model="form.description" class="textarea textarea-bordered w-full" rows="3" placeholder="Описание" />
-      <button type="button" class="btn btn-sm btn-secondary" :disabled="aiLoading" @click="autoFill">
-        <span v-if="aiLoading" class="loading loading-spinner loading-xs" />🤖 Заполнить с AI
-      </button>
-      <div class="grid grid-cols-2 gap-2">
-        <select v-model="form.category" class="select select-bordered">
+  <div class="flex flex-col gap-5">
+    <label class="field">
+      <span class="label">Описание</span>
+      <textarea v-model="form.description" class="textarea" rows="4" placeholder="Что произошло и где" />
+    </label>
+
+    <button type="button" class="btn btn-secondary self-start" :aria-busy="aiLoading" @click="autoFill">
+      <span v-if="aiLoading" class="spinner" /><WandSparkles v-else aria-hidden="true" />
+      Заполнить с AI
+    </button>
+
+    <label class="field">
+      <span class="label">Название</span>
+      <input v-model="form.title" class="input" placeholder="Коротко, 3–5 слов" @input="error = ''" />
+    </label>
+
+    <div class="grid grid-cols-2 gap-3">
+      <label class="field">
+        <span class="label">Категория</span>
+        <select v-model="form.category" class="select">
           <option v-for="(label, key) in categoryLabels" :key="key" :value="key">{{ label }}</option>
         </select>
-        <input v-model.number="form.priority" type="number" min="1" max="5" class="input input-bordered" />
-      </div>
-      <p class="text-xs opacity-60">
-        {{ form.lat ? `📍 ${form.lat.toFixed(4)}, ${form.lng.toFixed(4)}` : 'Кликни по карте, чтобы выбрать точку' }}
-      </p>
-      <button class="btn btn-primary">Добавить</button>
+      </label>
+      <label class="field">
+        <span class="label">Приоритет</span>
+        <select v-model.number="form.priority" class="select">
+          <option v-for="n in 5" :key="n" :value="n">{{ n }} из 5</option>
+        </select>
+      </label>
     </div>
-  </form>
+
+    <p class="hint">
+      {{ form.lat ? `Точка: ${form.lat.toFixed(4)}, ${form.lng.toFixed(4)}` : 'Точку на карте можно выбрать на странице «Карта»' }}
+    </p>
+    <p v-if="error" class="error-text">{{ error }}</p>
+  </div>
 </template>

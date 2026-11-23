@@ -1,11 +1,18 @@
 <script setup>
-defineProps({ text: { type: String, default: 'Пока пусто' } });
+import { Inbox } from 'lucide-vue-next';
+
+defineProps({
+  title: { type: String, default: 'Здесь пока пусто' },
+  text: String,
+  icon: { type: [Object, Function], default: () => Inbox },
+});
 </script>
 
 <template>
-  <div class="text-center py-10 opacity-60">
-    <div class="text-4xl mb-2">📭</div>
-    <p>{{ text }}</p>
+  <div class="empty">
+    <component :is="icon" aria-hidden="true" />
+    <h3>{{ title }}</h3>
+    <p v-if="text">{{ text }}</p>
     <slot />
   </div>
 </template>

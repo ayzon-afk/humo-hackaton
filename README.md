@@ -2,7 +2,7 @@
 
 Готовый фундамент, чтобы завтра тратить время **на идею и вау-фичу**, а не на настройку.
 
-**Стек:** Vue 3 + Vite + Tailwind 4 + DaisyUI 5 + Pinia · Express 5 + JWT + Socket.io · AI через любой OpenAI-совместимый API · Leaflet-карта Ташкента · Chart.js
+**Стек:** Vue 3 + Vite + Tailwind 4 (только сетка) + свой дизайн в стиле Apple + Lucide + Inter + Pinia · Express 5 + JWT + Socket.io · AI через любой OpenAI-совместимый API · Leaflet-карта Ташкента · Chart.js
 
 ## ⚡ Запуск (2 команды)
 
@@ -58,13 +58,18 @@ POST /api/upload      multipart: file → { url }
 
 Socket-события: `<collection>:created | updated | deleted`
 
+## 🎨 Дизайн
+
+- `client/src/styles/tokens.css` — все цвета, шрифты, отступы (меняешь здесь → меняется везде)
+- `docs/STYLE_CRM.md` — правила интерфейса системы
+- `docs/STYLE_WEBSITE.md` — правила сайта/лендинга
+
 ## 📚 Документы на день хакатона
 
 - `docs/DAY_PLAN.md` — тайминг дня и чек-лист
 - `docs/IDEA_CANVAS.md` — заполнить, как только объявят тему
 - `docs/PITCH.md` — структура питча на 3 минуты + ответы жюри
 
-## ?? ����
+## 🌐 Прод
 
-https://humo-hackaton-production.up.railway.app � ��������: `npm run deploy` (push �� GitHub + ������ �� Railway)
-
+https://humo-hackaton-production.up.railway.app — обновить: `npm run deploy` (push на GitHub + деплой на Railway)

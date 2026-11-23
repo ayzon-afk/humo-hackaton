@@ -1,0 +1,17 @@
+/* Сегментированный переключатель (как в iOS/macOS) вместо выпадающих списков */
+.segmented {
+  display: inline-flex; padding: 2px; gap: 2px;
+  background: var(--surface-active); border-radius: 9px;
+}
+.segmented button {
+  height: 28px; padding: 0 12px; border: 0; border-radius: 7px;
+  background: transparent; color: var(--text-secondary);
+  font: inherit; font-size: var(--fs-sm); font-weight: 500; cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.segmented button:hover { color: var(--text); }
+.segmented button[aria-pressed='true'] {
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+.segmented .count { margin-left: 6px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }

@@ -1,8 +1,0 @@
-@import "tailwindcss";
-@plugin "daisyui" {
-  themes: night --default, light;
-}
-
-html, body, #app { height: 100%; }
-
-.leaflet-container { border-radius: 1rem; z-index: 0; }

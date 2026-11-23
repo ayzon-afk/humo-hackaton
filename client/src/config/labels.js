@@ -5,11 +5,14 @@ export const statusLabels = {
   done: 'Готово',
 };
 
-export const statusBadge = {
-  new: 'badge-info',
-  in_progress: 'badge-warning',
-  done: 'badge-success',
+// Тон точки статуса: info (акцент) / warning / success / danger
+export const statusTone = {
+  new: 'info',
+  in_progress: 'warning',
+  done: 'success',
 };
+
+export const statusOrder = ['new', 'in_progress', 'done'];
 
 export const categoryLabels = {
   transport: 'Транспорт',
@@ -17,10 +20,4 @@ export const categoryLabels = {
   education: 'Образование',
   health: 'Здоровье',
   city: 'Город',
-};
-
-export const statusIcons = {
-  new: '🆕',
-  in_progress: '⏳',
-  done: '✅',
 };

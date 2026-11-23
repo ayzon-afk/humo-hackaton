@@ -1,34 +1,54 @@
 <script setup>
+import { Sparkles, Zap, MapPin, ShieldCheck, ChartLine, Users } from 'lucide-vue-next';
 import { project } from '@/config/project';
+import '@/styles/site.css';
+
+// Иконки, доступные в project.features (добавь нужную сюда)
+const icons = { Sparkles, Zap, MapPin, ShieldCheck, ChartLine, Users };
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
-    <section class="hero min-h-[80vh]">
-      <div class="hero-content text-center max-w-3xl flex-col gap-6">
-        <div class="badge badge-outline">Humo Arena Hackathon · {{ project.team }}</div>
-        <h1 class="text-5xl md:text-7xl font-black tracking-tight">{{ project.name }}</h1>
-        <p class="text-xl opacity-80">{{ project.tagline }}</p>
-        <div class="flex gap-3 justify-center">
-          <RouterLink to="/login" class="btn btn-primary btn-lg">Открыть демо</RouterLink>
-          <a href="#problem" class="btn btn-ghost btn-lg">Проблема ↓</a>
+  <div class="site">
+    <nav class="site-nav">
+      <div class="site-container">
+        <RouterLink to="/" class="brand"><span class="brand-mark">{{ project.name.charAt(0) }}</span><span class="brand-name">{{ project.name }}</span></RouterLink>
+        <div class="flex-1" />
+        <a href="#problem" class="link">Проблема</a>
+        <a href="#features" class="link">Решение</a>
+        <RouterLink to="/login" class="btn btn-primary btn-sm btn-pill">Открыть демо</RouterLink>
+      </div>
+    </nav>
+
+    <header class="site-container hero">
+      <span class="eyebrow reveal">{{ project.team }} · Humo Arena Hackathon</span>
+      <h1 class="display reveal reveal-2">{{ project.name }}</h1>
+      <p class="lead reveal reveal-3" style="max-width: 640px">{{ project.tagline }}</p>
+      <div class="actions reveal reveal-3">
+        <RouterLink to="/login" class="btn btn-primary btn-lg btn-pill">Попробовать</RouterLink>
+        <a href="#problem" class="link-arrow">Узнать больше</a>
+      </div>
+    </header>
+
+    <section id="problem" class="section section-muted">
+      <div class="site-container text-center flex flex-col items-center gap-6">
+        <div class="stat-xl">{{ project.problem.stat }}</div>
+        <p class="lead" style="max-width: 620px">{{ project.problem.text }}</p>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="site-container">
+        <h2 class="headline text-center">Как это работает</h2>
+        <div class="tiles">
+          <div v-for="f in project.features" :key="f.title" class="tile" style="background: var(--bg)">
+            <component :is="icons[f.icon] || Sparkles" aria-hidden="true" />
+            <h3>{{ f.title }}</h3>
+            <p>{{ f.text }}</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="problem" class="max-w-4xl mx-auto px-6 py-16 text-center">
-      <div class="text-7xl font-black text-primary">{{ project.problem.stat }}</div>
-      <p class="text-xl mt-4 opacity-80">{{ project.problem.text }}</p>
-    </section>
-
-    <section class="max-w-5xl mx-auto px-6 pb-24 grid md:grid-cols-3 gap-4">
-      <div v-for="f in project.features" :key="f.title" class="card bg-base-200">
-        <div class="card-body">
-          <div class="text-4xl">{{ f.icon }}</div>
-          <h3 class="card-title">{{ f.title }}</h3>
-          <p class="opacity-70">{{ f.text }}</p>
-        </div>
-      </div>
-    </section>
+    <footer class="site-footer"><div class="site-container">© 2026 {{ project.name }} · {{ project.team }}</div></footer>
   </div>
 </template>

@@ -11,6 +11,7 @@ const api = crudApi(NAME);
 export const useItemsStore = defineStore('items', () => {
   const items = ref([]);
   const loading = ref(false);
+  const freshIds = ref(new Set()); // подсветка новых строк (realtime)
   let subscribed = false;
 
   async function fetch(params) {
@@ -35,6 +36,11 @@ export const useItemsStore = defineStore('items', () => {
 
     socket.on(`${NAME}:created`, (item) => {
       if (!items.value.some((x) => x.id === item.id)) items.value.unshift(item);
+      freshIds.value = new Set([...freshIds.value, item.id]);
+      setTimeout(() => {
+        freshIds.value.delete(item.id);
+        freshIds.value = new Set(freshIds.value);
+      }, 2000);
       push(`Новая запись: ${item.title || 'без названия'}`, 'success');
     });
     socket.on(`${NAME}:updated`, (item) => {
@@ -46,5 +52,5 @@ export const useItemsStore = defineStore('items', () => {
     });
   }
 
-  return { items, loading, fetch, create, update, remove, subscribe };
+  return { items, loading, freshIds, fetch, create, update, remove, subscribe };
 });

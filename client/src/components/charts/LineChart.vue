@@ -1,31 +1,44 @@
 <script setup>
 import { computed } from 'vue';
 import { Line } from 'vue-chartjs';
-import './registerCharts';
+import { baseOptions, themeColors } from './registerCharts';
+import { useTheme } from '@/composables/useTheme';
 
 const props = defineProps({
   labels: { type: Array, default: () => [] },
   values: { type: Array, default: () => [] },
-  label: { type: String, default: 'Количество' },
+  height: { type: String, default: '220px' },
 });
 
-const data = computed(() => ({
-  labels: props.labels,
-  datasets: [
-    {
-      label: props.label,
-      data: props.values,
-      borderColor: '#38bdf8',
-      backgroundColor: 'rgba(56,189,248,0.15)',
-      fill: true,
-      tension: 0.35,
-    },
-  ],
-}));
+const { theme } = useTheme();
 
-const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+const chart = computed(() => {
+  theme.value; // пересчитать при смене темы
+  const c = themeColors();
+  return {
+    data: {
+      labels: props.labels,
+      datasets: [
+        {
+          data: props.values,
+          borderColor: c.accent,
+          backgroundColor: c.accentSoft,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: c.accent,
+          pointHoverBorderColor: c.surface,
+          pointHoverBorderWidth: 2,
+        },
+      ],
+    },
+    options: baseOptions(c),
+  };
+});
 </script>
 
 <template>
-  <div class="h-64"><Line :data="data" :options="options" /></div>
+  <div :style="{ height }"><Line :key="theme" :data="chart.data" :options="chart.options" /></div>
 </template>
