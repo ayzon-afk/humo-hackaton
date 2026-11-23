@@ -11,9 +11,9 @@ export const agentRouter = Router();
 
 agentRouter.use(requireAuth);
 
-agentRouter.get('/status', (_req, res) => res.json({ ...agentStatus(), ...snapshot() }));
+agentRouter.get('/status', async (_req, res) => res.json({ ...agentStatus(), ...(await snapshot()) }));
 
-agentRouter.get('/reports', (_req, res) => res.json(listReports()));
+agentRouter.get('/reports', async (_req, res) => res.json(await listReports()));
 
 agentRouter.post('/run', requireRole('admin', 'manager'), aiLimiter, async (_req, res) => {
   const report = await buildReport({ reason: 'manual' });

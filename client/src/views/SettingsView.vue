@@ -13,6 +13,8 @@ const auth = useAuthStore();
 const { theme, setTheme } = useTheme();
 const health = ref(null);
 
+const DB_LABELS = { postgres: 'PostgreSQL', file: 'JSON-файл (демо)' };
+
 const themeOptions = [
   { value: 'light', label: 'Светлая' },
   { value: 'dark', label: 'Тёмная' },
@@ -69,6 +71,8 @@ onMounted(async () => {
                 health?.ai ? 'Подключён' : 'Демо-режим'
               }}</span>
             </dd>
+            <dt>База данных</dt>
+            <dd>{{ DB_LABELS[health?.db] || '—' }}</dd>
             <dt>Данные</dt>
             <dd>{{ health?.collections?.join(', ') || '—' }}</dd>
             <dt>Версия</dt>

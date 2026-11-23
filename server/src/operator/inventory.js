@@ -19,10 +19,10 @@ const normalize = (text) => String(text).toLowerCase().replace(/ё/g, 'е').repl
 const stem = (word) => word.slice(0, Math.max(3, word.length - 2));
 
 /** «молоко», «молока», «Молоко 1 л» — всё найдёт «Молоко 1 л» */
-export function findProduct(name) {
+export async function findProduct(name) {
   const needle = normalize(name);
   if (!needle) return null;
-  const items = stock().all();
+  const items = await stock().all();
   const words = (item) => normalize(item.name).split(/\s+/);
   return (
     items.find((i) => normalize(i.name) === needle) ??
@@ -32,17 +32,20 @@ export function findProduct(name) {
   );
 }
 
-export function changeQuantity(id, delta) {
-  const item = stock().byId(id);
+export async function changeQuantity(id, delta) {
+  const item = await stock().byId(id);
   if (!item) throw httpError(404, 'Товар не найден на складе');
-  const updated = stock().update(id, { quantity: Math.max(0, item.quantity + delta) });
+  // атомарно: если остаток успели поменять параллельно — повторяем с новым значением
+  const patch = { quantity: Math.max(0, item.quantity + delta) };
+  const updated = await stock().update(id, patch, { quantity: item.quantity });
+  if (!updated) return changeQuantity(id, delta);
   emit('inventory:updated', updated);
   return updated;
 }
 
 /** Демо «продажа»: товар уходит ниже минимума — агент это заметит и позвонит */
-export function simulateSale(productId) {
-  const items = stock().all();
+export async function simulateSale(productId) {
+  const items = await stock().all();
   const target = productId
     ? items.find((i) => i.id === productId)
     : items.filter((i) => !isLow(i)).sort((a, b) => a.quantity / a.minQuantity - b.quantity / b.minQuantity)[0];
@@ -52,8 +55,8 @@ export function simulateSale(productId) {
 }
 
 /** Тревога для отчёта агента, когда что-то заканчивается */
-export function stockAlert() {
-  const low = stock().all().filter(isLow);
+export async function stockAlert() {
+  const low = (await stock().all()).filter(isLow);
   if (!low.length) return null;
   return {
     key: 'low-stock',

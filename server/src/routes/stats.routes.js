@@ -19,8 +19,8 @@ function lastDays(items, days = 14) {
   return result;
 }
 
-statsRouter.get('/:collection', (req, res) => {
-  const items = collection(req.params.collection).all();
+statsRouter.get('/:collection', async (req, res) => {
+  const items = await collection(req.params.collection).all();
   res.json({
     total: items.length,
     byStatus: countBy(items, 'status'),

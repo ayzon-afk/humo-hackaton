@@ -22,7 +22,7 @@ const answer = (reply, proposals = [], source = 'rules') => ({ reply, proposals,
 async function withAi(text) {
   const { content, toolCalls } = await chatWithTools({
     messages: [
-      { role: 'system', content: `${INSTRUCTION}\nДанные бизнеса: ${JSON.stringify(businessContext())}` },
+      { role: 'system', content: `${INSTRUCTION}\nДанные бизнеса: ${JSON.stringify(await businessContext())}` },
       { role: 'user', content: text },
     ],
     tools: toolDefinitions(),
@@ -53,7 +53,7 @@ async function withRules(text) {
   const order = text.match(ORDER);
   if (order) {
     const [, quantity, product] = clean(order[1]).match(QUANTITY) ?? [null, null, clean(order[1])];
-    const item = findProduct(product);
+    const item = await findProduct(product);
     const proposal = await propose({
       action: 'place_order',
       params: { product, quantity: Number(quantity) || (item ? reorderQuantity(item) : 1) },
@@ -69,8 +69,9 @@ async function withRules(text) {
     const report = await propose({ action: 'run_report' });
     return answer(report.result);
   }
-  if (BRIEFING.test(text)) return answer(briefingFromRules());
-  return answer(`Могу заказать товар, создать задачу или сделать отчёт. ${briefingFromRules()}`);
+  const briefing = briefingFromRules(await businessContext());
+  if (BRIEFING.test(text)) return answer(briefing);
+  return answer(`Могу заказать товар, создать задачу или сделать отчёт. ${briefing}`);
 }
 
 export async function handleCommand(text) {

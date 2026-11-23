@@ -38,7 +38,7 @@ function scheduleReport() {
 /** Проверка алертов: новые critical/warning сразу уходят в CRM (WebSocket) и Telegram */
 async function checkAlerts() {
   state.lastCheckAt = new Date().toISOString();
-  const { alerts } = snapshot();
+  const { alerts } = await snapshot();
   for (const alert of alerts) {
     if (alert.level === 'info' || state.seenAlerts.has(alert.key)) continue;
     state.seenAlerts.add(alert.key);
@@ -55,10 +55,13 @@ async function checkAlerts() {
 export function startAgent() {
   if (!config.agent.enabled || config.env === 'test') return;
   // первый отчёт сразу, чтобы в CRM было что показать
-  if (listReports(1).length === 0) buildReport({ reason: 'startup' }).catch(() => {});
+  listReports(1)
+    .then((reports) => reports.length || buildReport({ reason: 'startup' }))
+    .catch((err) => console.error('🤖 Агент: первый отчёт не построен —', err.message));
   scheduleReport();
-  checkAlerts();
-  state.timers.push(setInterval(checkAlerts, config.agent.checkMinutes * 60_000));
+  const check = () => checkAlerts().catch((err) => console.error('🤖 Агент: ошибка проверки —', err.message));
+  check();
+  state.timers.push(setInterval(check, config.agent.checkMinutes * 60_000));
   console.log(`🤖 Агент: отчёт каждый день в ${config.agent.reportTime} (${config.agent.timezone})`);
 }
 

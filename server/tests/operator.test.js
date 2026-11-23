@@ -13,7 +13,7 @@ describe('operator: склад и звонок агента', () => {
   it('товар ниже минимума → одно предложение заказа, без дублей', async () => {
     await scanInventory();
     await scanInventory();
-    const eggs = findProduct('яйца');
+    const eggs = await findProduct('яйца');
     const pending = (await state(await adminAuth())).pending.filter((p) => p.params.productId === eggs.id);
     expect(pending).toHaveLength(1);
     expect(pending[0]).toMatchObject({ action: 'place_order', source: 'agent' });
@@ -24,7 +24,7 @@ describe('operator: склад и звонок агента', () => {
     const headers = await adminAuth();
     const before = await state(headers);
     const proposal = before.pending.find((p) => p.source === 'agent');
-    const eggsBefore = findProduct('яйца').quantity;
+    const eggsBefore = (await findProduct('яйца')).quantity;
 
     const res = await api().post(`/api/operator/proposals/${proposal.id}/confirm`).set(headers).send({});
     expect(res.status).toBe(200);
@@ -32,7 +32,7 @@ describe('operator: склад и звонок агента', () => {
 
     const after = await state(headers);
     expect(after.balance).toBe(before.balance - proposal.amount);
-    expect(findProduct('яйца').quantity).toBe(eggsBefore + proposal.params.quantity);
+    expect((await findProduct('яйца')).quantity).toBe(eggsBefore + proposal.params.quantity);
     expect(after.history[0].id).toBe(proposal.id);
   });
 
@@ -75,9 +75,9 @@ describe('operator: голосовые команды без AI-ключа', () 
     expect(items.body[0].history[0].type).toBe('created');
   });
 
-  it('товар находится в любом падеже: «яиц» → «Яйца 10 шт»', () => {
-    expect(findProduct('яиц').name).toBe('Яйца 10 шт');
-    expect(findProduct('молока').name).toBe('Молоко 1 л');
+  it('товар находится в любом падеже: «яиц» → «Яйца 10 шт»', async () => {
+    expect((await findProduct('яиц')).name).toBe('Яйца 10 шт');
+    expect((await findProduct('молока')).name).toBe('Молоко 1 л');
   });
 
   it('неизвестный товар — понятный ответ, а не ошибка', async () => {
@@ -153,8 +153,8 @@ describe('operator: демо и деньги', () => {
 
   it('не хватает денег → действие не выполнено, баланс не тронут', async () => {
     const headers = await adminAuth();
-    const [wallet] = collection('wallet').all();
-    collection('wallet').update(wallet.id, { balance: 1000 });
+    const [wallet] = await collection('wallet').all();
+    await collection('wallet').update(wallet.id, { balance: 1000 });
 
     const proposal = await propose({ action: 'place_order', params: { product: 'сахар', quantity: 1 } });
     const res = await api().post(`/api/operator/proposals/${proposal.id}/confirm`).set(headers).send({});

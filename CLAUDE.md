@@ -23,7 +23,7 @@ npm run deploy     # коммит + push + деплой на Railway (одной
 ## Стек
 
 Vue 3 (Composition API, `<script setup>`) + Vite + Pinia + Vue Router + Tailwind 4 (только сетка) · Express 5 + Socket.io + Zod + JWT ·
-хранилище — JSON-файл (`server/src/db/store.js`) · AI — любой OpenAI-совместимый API (`server/src/services/ai.service.js`).
+хранилище — PostgreSQL при `DATABASE_URL`, иначе JSON-файл (`server/src/db/store.js`, миграции в `server/src/db/migrations/`) · AI — любой OpenAI-совместимый API (`server/src/services/ai.service.js`).
 
 ## Где что лежит
 

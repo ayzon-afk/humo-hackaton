@@ -5,11 +5,15 @@ import { isLow, stock } from './inventory.js';
 import { getBalance, money } from './wallet.js';
 import { pendingProposals } from './proposals.js';
 
-export function businessContext() {
-  const { metrics, alerts } = snapshot();
-  const items = stock().all();
+export async function businessContext() {
+  const [{ metrics, alerts }, items, balance, pending] = await Promise.all([
+    snapshot(),
+    stock().all(),
+    getBalance(),
+    pendingProposals(),
+  ]);
   return {
-    balance: money(getBalance()),
+    balance: money(balance),
     limitPerAction: money(config.operator.maxAmount),
     stock: items.map((i) => ({
       name: i.name,
@@ -28,6 +32,6 @@ export function businessContext() {
     },
     // склад уже описан выше — тревогу о нём не повторяем
     alerts: alerts.filter((a) => a.key !== 'low-stock').map((a) => `${a.title}: ${a.detail}`),
-    waitingForOwner: pendingProposals().map((p) => p.summary),
+    waitingForOwner: pending.map((p) => p.summary),
   };
 }

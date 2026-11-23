@@ -9,12 +9,12 @@ export const usersRouter = Router();
 
 usersRouter.use(requireAuth);
 
-usersRouter.get('/', (_req, res) => res.json(listUsers()));
+usersRouter.get('/', async (_req, res) => res.json(await listUsers()));
 
-usersRouter.post('/', requireRole('admin'), validate(userCreateSchema), (req, res) =>
-  res.status(201).json(register(req.body).user),
+usersRouter.post('/', requireRole('admin'), validate(userCreateSchema), async (req, res) =>
+  res.status(201).json((await register(req.body)).user),
 );
 
-usersRouter.patch('/:id', requireRole('admin'), validate(userUpdateSchema), (req, res) =>
-  res.json(updateUser(req.params.id, req.body)),
+usersRouter.patch('/:id', requireRole('admin'), validate(userUpdateSchema), async (req, res) =>
+  res.json(await updateUser(req.params.id, req.body)),
 );

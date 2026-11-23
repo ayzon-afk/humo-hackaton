@@ -18,17 +18,23 @@ operatorRouter.use(requireAuth);
 
 const canDecide = requireRole('admin', 'manager');
 
-operatorRouter.get('/state', (_req, res) =>
+operatorRouter.get('/state', async (_req, res) => {
+  const [balance, items, pending, history] = await Promise.all([
+    getBalance(),
+    stock().all(),
+    pendingProposals(),
+    proposalHistory(),
+  ]);
   res.json({
     name: config.operator.name,
-    balance: getBalance(),
+    balance,
     currency: config.operator.currency,
     maxAmount: config.operator.maxAmount,
-    stock: stock().all(),
-    pending: pendingProposals(),
-    history: proposalHistory(),
-  }),
-);
+    stock: items,
+    pending,
+    history,
+  });
+});
 
 operatorRouter.post('/command', aiLimiter, validate(operatorCommandSchema), async (req, res) =>
   res.json(await handleCommand(req.body.text)),
@@ -46,7 +52,7 @@ operatorRouter.post('/proposals/:id/reject', canDecide, validate(proposalDecisio
 
 /** Демо на сцене: товар «продали» → агент сразу замечает и звонит */
 operatorRouter.post('/demo/sale', canDecide, validate(demoSaleSchema), async (req, res) => {
-  const item = simulateSale(req.body.productId);
+  const item = await simulateSale(req.body.productId);
   const proposals = await scanInventory();
   res.status(201).json({ item, proposal: proposals.find((p) => p.params.productId === item.id) ?? null });
 });

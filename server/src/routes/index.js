@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { config } from '../config.js';
+import { storeKind } from '../db/store.js';
 import { aiEnabled } from '../services/ai.service.js';
 import { authRouter } from './auth.routes.js';
 import { usersRouter } from './users.routes.js';
@@ -14,7 +15,13 @@ export function apiRouter() {
   const router = Router();
 
   router.get('/health', (_req, res) =>
-    res.json({ ok: true, ai: aiEnabled(), collections: config.collections, time: new Date().toISOString() }),
+    res.json({
+      ok: true,
+      ai: aiEnabled(),
+      db: storeKind(),
+      collections: config.collections,
+      time: new Date().toISOString(),
+    }),
   );
 
   router.use('/auth', authRouter);

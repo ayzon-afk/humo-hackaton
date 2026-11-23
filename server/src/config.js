@@ -39,6 +39,11 @@ export const config = {
     maxAmount: Number(env.OPERATOR_MAX_AMOUNT) || 5_000_000, // лимит одного действия AI
     currency: env.OPERATOR_CURRENCY || 'сум',
   },
+  db: {
+    url: env.DATABASE_URL || '', // пусто → данные в JSON-файле (paths.dataFile)
+    schema: env.DATABASE_SCHEMA || '',
+    ssl: env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  },
   paths: {
     dataFile: env.DATA_FILE || path.join(serverRoot, 'data', 'db.json'),
     uploadsDir: path.join(serverRoot, 'uploads'),

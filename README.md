@@ -26,7 +26,8 @@
 | -------- | ------------------------------------------------------------------------------------------------------------- |
 | Клиент   | Vue 3 (Composition API), Vite, Pinia, Vue Router, Tailwind 4 (только сетка), Lucide, Inter, Chart.js, Leaflet |
 | Сервер   | Node.js, Express 5, Socket.io, JWT, bcrypt, Zod, Helmet, express-rate-limit                                   |
-| Качество | ESLint, Prettier, Vitest + Supertest, GitHub Actions                                                          |
+| База     | PostgreSQL (`pg`, SQL-миграции, JSONB + индексы); без `DATABASE_URL` — JSON-файл для демо                     |
+| Качество | ESLint, Prettier, Vitest + Supertest (тесты на JSON и на PostgreSQL), GitHub Actions                          |
 | Деплой   | Railway (один сервис: API + WebSocket + фронт)                                                                |
 
 ## Быстрый старт
@@ -54,6 +55,12 @@ npm run dev           # сервер :5000 + клиент :5173
 3. `client/src/config/labels.js` — статусы и категории
 4. `server/.env` → `COLLECTIONS=` — своя сущность (и `project.mainCollection`)
 5. `server/src/db/seed.js` — реалистичные демо-данные → `npm run seed`
+
+## База данных
+
+`server/.env` → `DATABASE_URL=postgres://user:pass@host:5432/db` — PostgreSQL. Таблицы создаются сами при запуске (`server/src/db/migrations/`).
+Без `DATABASE_URL` данные хранятся в JSON-файле — удобно для демо без базы.
+Тесты на PostgreSQL: `TEST_DATABASE_URL=postgres://… npm test` (каждый файл тестов получает свою схему).
 
 ## AI
 

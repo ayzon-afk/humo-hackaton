@@ -1,8 +1,13 @@
+import { afterAll } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
+import { closeStore, initStore } from '../src/db/store.js';
 import { ensureSeed } from '../src/db/seed.js';
 
-ensureSeed();
+await initStore();
+await ensureSeed();
+afterAll(() => closeStore({ dropSchema: true }));
+
 export const app = createApp();
 export const api = () => request(app);
 

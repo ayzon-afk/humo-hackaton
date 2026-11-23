@@ -7,14 +7,14 @@ import { register, login, getUser } from '../services/auth.service.js';
 
 export const authRouter = Router();
 
-authRouter.post('/register', authLimiter, validate(registerSchema), (req, res) =>
-  res.status(201).json(register(req.body)),
+authRouter.post('/register', authLimiter, validate(registerSchema), async (req, res) =>
+  res.status(201).json(await register(req.body)),
 );
 
-authRouter.post('/login', authLimiter, validate(loginSchema), (req, res) => res.json(login(req.body)));
+authRouter.post('/login', authLimiter, validate(loginSchema), async (req, res) => res.json(await login(req.body)));
 
-authRouter.get('/me', requireAuth, (req, res) => {
-  const user = getUser(req.user.id);
+authRouter.get('/me', requireAuth, async (req, res) => {
+  const user = await getUser(req.user.id);
   if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
   res.json({ user });
 });

@@ -8,10 +8,10 @@ import { stockAlert } from '../operator/inventory.js';
 const KEEP_REPORTS = 30;
 
 /** Текущее состояние бизнеса: метрики + алерты (без AI, мгновенно) */
-export function snapshot(now = Date.now()) {
+export async function snapshot(now = Date.now()) {
   const { collection: name, doneStatus, staleHours } = config.agent;
-  const metrics = computeMetrics(collection(name).all(), { now, doneStatus, staleHours });
-  return { metrics, alerts: [stockAlert(), ...detectAlerts(metrics)].filter(Boolean) };
+  const metrics = computeMetrics(await collection(name).all(), { now, doneStatus, staleHours });
+  return { metrics, alerts: [await stockAlert(), ...detectAlerts(metrics)].filter(Boolean) };
 }
 
 /** Какое действие предложить по каждой тревоге (когда AI недоступен) */
@@ -47,7 +47,7 @@ const INSTRUCTION = `Ты — AI-операционный директор. По
 
 /** Полный ежедневный отчёт: метрики → алерты → вывод AI. Сохраняется в коллекцию reports. */
 export async function buildReport({ reason = 'manual' } = {}) {
-  const { metrics, alerts } = snapshot();
+  const { metrics, alerts } = await snapshot();
   const fallback = fallbackNarrative(metrics, alerts);
 
   const { result, demo } = await analyze({
@@ -60,17 +60,15 @@ export async function buildReport({ reason = 'manual' } = {}) {
     : fallback;
 
   const reports = collection('reports');
-  const report = reports.insert({ reason, metrics, alerts, ai, source: fromAi ? 'ai' : 'rules' });
+  const report = await reports.insert({ reason, metrics, alerts, ai, source: fromAi ? 'ai' : 'rules' });
 
-  const all = reports.all().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  all.slice(0, Math.max(0, all.length - KEEP_REPORTS)).forEach((r) => reports.remove(r.id));
+  // храним только последние KEEP_REPORTS отчётов
+  const old = (await reports.query({ sort: '-createdAt' })).slice(KEEP_REPORTS);
+  await Promise.all(old.map((r) => reports.remove(r.id)));
 
   return report;
 }
 
 export function listReports(limit = 14) {
-  return collection('reports')
-    .all()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, limit);
+  return collection('reports').query({ sort: '-createdAt', limit });
 }

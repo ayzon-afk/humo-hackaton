@@ -10,9 +10,9 @@
 | GitHub              | https://github.com/ayzon-afk/humo-hackaton                       |
 | CI (проверки)       | https://github.com/ayzon-afk/humo-hackaton/actions               |
 | Railway             | https://railway.com/project/3633a450-c494-45df-b188-3873f4dccb7e |
-| Папка на ноутбуке   | `C:\Users\user\Desktop\HUMO HACKATHON`                           |
+| Папка на ноутбуке   | `C:\Users\user\Desktop\humo`                                     |
 
-## Демо-логины (пересоздаются при `npm run seed` и каждом деплое)
+## Демо-логины (создаются при первом запуске и пересоздаются при `npm run seed`)
 
 | Роль          | Email          | Пароль   |
 | ------------- | -------------- | -------- |

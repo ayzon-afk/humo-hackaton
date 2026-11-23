@@ -2,10 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { collection } from '../db/store.js';
 import { config } from '../config.js';
+import { httpError } from '../utils/httpError.js';
 
 const users = () => collection('users');
-
-const httpError = (status, message) => Object.assign(new Error(message), { status });
 
 export function publicUser(user) {
   const { passwordHash, ...rest } = user;
@@ -19,10 +18,10 @@ export function signToken(user) {
 }
 
 /** Регистрация. Данные уже провалидированы схемой registerSchema. */
-export function register({ name, email, password, role = 'user' }) {
+export async function register({ name, email, password, role = 'user' }) {
   const normalized = String(email).toLowerCase().trim();
-  if (users().findOne((u) => u.email === normalized)) throw httpError(409, 'Email уже занят');
-  const user = users().insert({
+  if (await users().findOne({ email: normalized })) throw httpError(409, 'Email уже занят');
+  const user = await users().insert({
     name,
     email: normalized,
     role,
@@ -31,11 +30,11 @@ export function register({ name, email, password, role = 'user' }) {
   return { user: publicUser(user), token: signToken(user) };
 }
 
-export function login({ email, password }) {
+export async function login({ email, password }) {
   const normalized = String(email || '')
     .toLowerCase()
     .trim();
-  const user = users().findOne((u) => u.email === normalized);
+  const user = await users().findOne({ email: normalized });
   if (!user || !bcrypt.compareSync(password || '', user.passwordHash)) {
     throw httpError(401, 'Неверный email или пароль');
   }
@@ -43,25 +42,22 @@ export function login({ email, password }) {
 }
 
 /** Список пользователей без хешей паролей */
-export function listUsers() {
-  return users()
-    .all()
-    .map(publicUser)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+export async function listUsers() {
+  return (await users().all()).map(publicUser);
 }
 
 /** Обновление имени/роли. Последнего админа понизить нельзя. */
-export function updateUser(id, patch) {
-  const user = users().byId(id);
+export async function updateUser(id, patch) {
+  const user = await users().byId(id);
   if (!user) throw httpError(404, 'Пользователь не найден');
   if (patch.role && patch.role !== 'admin' && user.role === 'admin') {
-    const admins = users().find((u) => u.role === 'admin').length;
+    const admins = await users().count({ role: 'admin' });
     if (admins <= 1) throw httpError(400, 'Нельзя убрать последнего администратора');
   }
-  return publicUser(users().update(id, patch));
+  return publicUser(await users().update(id, patch));
 }
 
-export function getUser(id) {
-  const user = users().byId(id);
+export async function getUser(id) {
+  const user = await users().byId(id);
   return user ? publicUser(user) : null;
 }

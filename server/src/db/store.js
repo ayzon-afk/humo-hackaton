@@ -1,65 +1,48 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { config } from '../config.js';
+import { createFileDriver } from './drivers/fileDriver.js';
+import { createPostgresDriver } from './drivers/postgresDriver.js';
 
-// Простое JSON-хранилище: всё в памяти, на диск пишется с задержкой 100 мс.
-let db = null;
-let timer = null;
+/**
+ * Хранилище: PostgreSQL, если задан DATABASE_URL, иначе JSON-файл (тесты, демо без базы).
+ * Код приложения работает только с collection(name) и не знает, какая база под ним.
+ */
+let driver = null;
 
-function load() {
-  if (db) return db;
-  try {
-    db = JSON.parse(fs.readFileSync(config.paths.dataFile, 'utf8'));
-  } catch {
-    db = {};
-  }
-  return db;
+export async function initStore() {
+  if (driver) return driver;
+  const { url, schema, ssl } = config.db;
+  driver = url ? await createPostgresDriver({ url, schema, ssl }) : createFileDriver(config.paths.dataFile);
+  return driver;
 }
 
-function persist() {
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    fs.mkdirSync(path.dirname(config.paths.dataFile), { recursive: true });
-    fs.writeFileSync(config.paths.dataFile, JSON.stringify(db, null, 2));
-  }, 100);
+export const storeKind = () => driver?.kind ?? 'none';
+
+export async function closeStore(options) {
+  await driver?.close(options);
+  driver = null;
 }
 
+const ready = () => {
+  if (!driver) throw new Error('Хранилище не инициализировано: вызовите initStore()');
+  return driver;
+};
+
+/** Коллекция документов. where — равенство полей: { status: 'new' } */
 export function collection(name) {
-  const data = load();
-  if (!data[name]) data[name] = [];
-  const list = () => data[name];
-  const byId = (id) => list().find((x) => x.id === id);
-
   return {
-    all: () => [...list()],
-    find: (fn) => list().filter(fn),
-    findOne: (fn) => list().find(fn),
-    byId,
-    count: () => list().length,
-    insert(doc) {
-      const item = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...doc };
-      list().push(item);
-      persist();
-      return item;
-    },
-    update(id, patch) {
-      const item = byId(id);
-      if (!item) return null;
-      Object.assign(item, patch, { id, updatedAt: new Date().toISOString() });
-      persist();
-      return item;
-    },
-    remove(id) {
-      const i = list().findIndex((x) => x.id === id);
-      if (i === -1) return false;
-      list().splice(i, 1);
-      persist();
-      return true;
-    },
-    clear() {
-      data[name] = [];
-      persist();
-    },
+    all: () => ready().query(name, { sort: 'createdAt' }),
+    find: (where = {}) => ready().query(name, { where, sort: 'createdAt' }),
+    findOne: async (where = {}) => (await ready().query(name, { where, sort: 'createdAt', limit: 1 }))[0] ?? null,
+    /** Фильтр + поиск + сортировка + лимит — выполняются в базе */
+    query: (options) => ready().query(name, options),
+    byId: (id) => ready().byId(name, id),
+    count: (where) => ready().count(name, where),
+    insert: (doc) => ready().insert(name, { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...doc }),
+    /** Обновить поля. expected — обновить, только если документ всё ещё такой (защита от гонок) */
+    update: (id, patch, expected) =>
+      ready().update(name, id, { ...patch, id, updatedAt: new Date().toISOString() }, expected),
+    remove: (id) => ready().remove(name, id),
+    clear: () => ready().clear(name),
   };
 }

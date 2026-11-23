@@ -4,7 +4,7 @@ import { propose } from './proposals.js';
 
 export async function scanInventory() {
   const found = [];
-  for (const item of stock().all().filter(isLow)) {
+  for (const item of (await stock().all()).filter(isLow)) {
     try {
       found.push(
         await propose({

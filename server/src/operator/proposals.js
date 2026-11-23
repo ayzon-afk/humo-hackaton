@@ -19,7 +19,7 @@ export async function propose({ action, params = {}, reason = '', source = 'comm
   const parsed = definition.schema.safeParse(params);
   if (!parsed.success) throw httpError(400, `Не хватает данных: ${parsed.error.issues[0].message}`);
 
-  const prepared = definition.prepare(parsed.data);
+  const prepared = await definition.prepare(parsed.data);
   if (prepared.amount > config.operator.maxAmount) {
     throw httpError(
       400,
@@ -28,10 +28,10 @@ export async function propose({ action, params = {}, reason = '', source = 'comm
   }
 
   // агент проверяет склад регулярно — не звоним дважды по одному поводу
-  const duplicate = dedupeKey && proposals().findOne((p) => p.status === 'pending' && p.dedupeKey === dedupeKey);
+  const duplicate = dedupeKey && (await proposals().findOne({ status: 'pending', dedupeKey }));
   if (duplicate) return duplicate;
 
-  const proposal = proposals().insert({
+  const proposal = await proposals().insert({
     action,
     title: definition.title,
     params: prepared.params,
@@ -50,13 +50,14 @@ export async function propose({ action, params = {}, reason = '', source = 'comm
 
 /** Подтвердить или отклонить. Выполняется только pending — двойное «да» ничего не сломает. */
 export async function resolve(id, { approve, by }) {
-  const proposal = proposals().byId(id);
+  const proposal = await proposals().byId(id);
   if (!proposal) throw httpError(404, 'Предложение не найдено');
-  if (proposal.status !== 'pending') throw httpError(409, 'Это решение уже принято');
+  // атомарно забираем решение: второе «да» с другого телефона получит 409, а не двойной заказ
+  const claimed = await proposals().update(id, { status: approve ? 'running' : 'rejected' }, { status: 'pending' });
+  if (!claimed) throw httpError(409, 'Это решение уже принято');
 
   let patch = { status: 'rejected', result: 'Отклонено' };
   if (approve) {
-    proposals().update(id, { status: 'running' });
     try {
       const result = await ACTIONS[proposal.action].execute(proposal.params, {
         amount: proposal.amount,
@@ -67,20 +68,14 @@ export async function resolve(id, { approve, by }) {
       patch = { status: 'failed', result: err.message };
     }
   }
-  const updated = proposals().update(id, { ...patch, resolvedBy: by, resolvedAt: new Date().toISOString() });
+  const updated = await proposals().update(id, { ...patch, resolvedBy: by, resolvedAt: new Date().toISOString() });
   emit('operator:resolved', updated);
   return updated;
 }
 
-const newestFirst = (a, b) => b.createdAt.localeCompare(a.createdAt);
+export const pendingProposals = () => proposals().query({ where: { status: 'pending' }, sort: '-createdAt' });
 
-export const pendingProposals = () =>
-  proposals()
-    .find((p) => p.status === 'pending')
-    .sort(newestFirst);
-
-export const proposalHistory = (limit = 20) =>
-  proposals()
-    .find((p) => !['pending', 'running'].includes(p.status))
-    .sort((a, b) => (b.resolvedAt ?? '').localeCompare(a.resolvedAt ?? ''))
+export const proposalHistory = async (limit = 20) =>
+  (await proposals().query({ sort: '-resolvedAt' }))
+    .filter((p) => !['pending', 'running'].includes(p.status))
     .slice(0, limit);

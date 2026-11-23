@@ -29,8 +29,8 @@ export const ACTIONS = {
       quantity: { type: 'integer', description: 'Сколько единиц заказать' },
     }),
     schema: z.object({ product: z.string().trim().min(1), quantity: z.coerce.number().int().min(1).max(100_000) }),
-    prepare({ product, quantity }) {
-      const item = findProduct(product);
+    async prepare({ product, quantity }) {
+      const item = await findProduct(product);
       if (!item) throw httpError(404, `Товар «${product}» не найден на складе`);
       const amount = item.unitPrice * quantity;
       return {
@@ -39,10 +39,10 @@ export const ACTIONS = {
         summary: `Заказать ${quantity} ${item.unit} «${item.name}» у ${item.supplier} за ${money(amount)}`,
       };
     },
-    execute({ productId, product, quantity }, { amount }) {
-      const balance = charge(amount, `Заказ: ${product}`);
-      const item = changeQuantity(productId, quantity);
-      collection('orders').insert({ productId, product, quantity, amount, supplier: item.supplier });
+    async execute({ productId, product, quantity }, { amount }) {
+      const balance = await charge(amount, `Заказ: ${product}`);
+      const item = await changeQuantity(productId, quantity);
+      await collection('orders').insert({ productId, product, quantity, amount, supplier: item.supplier });
       return `Заказ оформлен: ${product}, ${quantity} ${item.unit}. На складе ${item.quantity}, на счёте ${money(balance)}`;
     },
   },
@@ -64,8 +64,8 @@ export const ACTIONS = {
       priority: z.coerce.number().int().min(1).max(5).default(3),
     }),
     prepare: (p) => ({ params: p, amount: 0, summary: `Создать задачу «${p.title}», приоритет ${p.priority}` }),
-    execute(p, { by }) {
-      const item = records().insert({
+    async execute(p, { by }) {
+      const item = await records().insert({
         status: 'new',
         ...p,
         userId: null,
@@ -84,9 +84,10 @@ export const ACTIONS = {
       status: { type: 'string', description: 'Новый статус из списка статусов системы' },
     }),
     schema: z.object({ record: z.string().trim().min(1), status: z.string().trim().min(1).max(40) }),
-    prepare({ record, status }) {
-      const needle = record.toLowerCase();
-      const item = records().byId(record) ?? records().findOne((i) => String(i.title).toLowerCase().includes(needle));
+    async prepare({ record, status }) {
+      const item =
+        (await records().byId(record)) ??
+        (await records().query({ search: record, searchFields: ['title'], limit: 1 }))[0];
       if (!item) throw httpError(404, `Запись «${record}» не найдена`);
       return {
         params: { id: item.id, title: item.title, status },
@@ -94,11 +95,11 @@ export const ACTIONS = {
         summary: `Перевести «${item.title}» в статус «${status}»`,
       };
     },
-    execute({ id, status }, { by }) {
-      const current = records().byId(id);
+    async execute({ id, status }, { by }) {
+      const current = await records().byId(id);
       if (!current) throw httpError(404, 'Запись уже удалена');
       const entry = { type: 'changed', by, at: now(), field: 'status', from: current.status, to: status };
-      const item = records().update(id, { status, history: [...(current.history ?? []), entry] });
+      const item = await records().update(id, { status, history: [...(current.history ?? []), entry] });
       emit(`${config.agent.collection}:updated`, item);
       return `Статус записи «${item.title}» изменён`;
     },

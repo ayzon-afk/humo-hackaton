@@ -4,7 +4,7 @@ import { chat } from '../services/ai.service.js';
 import { businessContext } from './context.js';
 
 /** Брифинг по правилам — работает всегда, даже без AI-ключа */
-export function briefingFromRules(context = businessContext()) {
+export function briefingFromRules(context) {
   const low = context.stock.filter((i) => i.low);
   const parts = [`На счёте ${context.balance}.`];
   parts.push(low.length ? `Заканчивается: ${low.map((i) => i.name).join(', ')}.` : 'Склад в порядке.');
@@ -19,7 +19,7 @@ const INSTRUCTION = `Ты — ${config.operator.name}. Владелец слуш
 Без списков, markdown и эмодзи. Опирайся только на данные.`;
 
 export async function buildBriefing() {
-  const context = businessContext();
+  const context = await businessContext();
   const fallback = briefingFromRules(context);
   const { reply, demo } = await chat({
     system: INSTRUCTION,

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { collection } from './store.js';
+import { closeStore, collection, initStore } from './store.js';
 import { config } from '../config.js';
 import { DEMO_STOCK } from './demoStock.js';
 import { resetWallet } from '../operator/wallet.js';
@@ -59,33 +59,39 @@ const DEMO_USERS = [
 ];
 
 /** Создаёт демо-пользователей и демо-данные, если их ещё нет. reset — пересоздать всё. */
-export function ensureSeed({ reset = false } = {}) {
+export async function ensureSeed({ reset = false } = {}) {
   const users = collection('users');
-  if (reset) users.clear();
+  if (reset) await users.clear();
   for (const { password, ...user } of DEMO_USERS) {
-    if (!users.findOne((u) => u.email === user.email)) {
-      users.insert({ ...user, passwordHash: bcrypt.hashSync(password, 10) });
+    if (!(await users.findOne({ email: user.email }))) {
+      await users.insert({ ...user, passwordHash: bcrypt.hashSync(password, 10) });
     }
   }
 
+  if (reset) await collection('reports').clear();
   for (const name of config.collections) {
     const col = collection(name);
-    if (reset) col.clear();
-    if (reset) collection('reports').clear();
-    if (col.count() === 0) demoItems().forEach((item) => col.insert(item));
+    if (reset) await col.clear();
+    if ((await col.count()) === 0) await insertAll(col, demoItems());
   }
 
   // AI-управляющий: склад, счёт, журнал решений
   const stock = collection('inventory');
   if (reset) {
-    stock.clear();
-    ['proposals', 'orders'].forEach((name) => collection(name).clear());
-    resetWallet();
+    await Promise.all([stock, collection('proposals'), collection('orders')].map((c) => c.clear()));
+    await resetWallet();
   }
-  if (stock.count() === 0) DEMO_STOCK.forEach((item) => stock.insert(item));
+  if ((await stock.count()) === 0) await insertAll(stock, DEMO_STOCK);
+}
+
+// по одной: порядок вставки = порядок в демо
+async function insertAll(col, docs) {
+  for (const doc of docs) await col.insert(doc);
 }
 
 if (process.argv.includes('--reset')) {
-  ensureSeed({ reset: true });
-  setTimeout(() => console.log('✅ База пересоздана. Логин: admin@demo.uz / admin123'), 200);
+  await initStore();
+  await ensureSeed({ reset: true });
+  await closeStore();
+  console.log('✅ База пересоздана. Логин: admin@demo.uz / admin123');
 }
