@@ -34,7 +34,7 @@ railway redeploy                        # перезапустить после�
 
 | Провайдер                       | Где взять ключ                       | AI_BASE_URL                                               | AI_MODEL                  |
 | ------------------------------- | ------------------------------------ | --------------------------------------------------------- | ------------------------- |
-| Gemini (бесплатно, умеет фото)  | https://aistudio.google.com/apikey   | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.5-flash`        |
+| Gemini (бесплатно, умеет фото)  | https://aistudio.google.com/apikey   | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-3.8-flash`        |
 | Groq (бесплатно, очень быстрый) | https://console.groq.com/keys        | `https://api.groq.com/openai/v1`                          | `llama-3.3-70b-versatile` |
 | OpenAI                          | https://platform.openai.com/api-keys | `https://api.openai.com/v1`                               | `gpt-4o-mini`             |
 

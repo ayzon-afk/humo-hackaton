@@ -104,13 +104,14 @@ describe('operator: голосовые команды без AI-ключа', () 
 });
 
 describe('operator: с AI-ключом (ответ модели подменён)', () => {
-  /** Включить «AI» на время теста: fetch отвечает заданным message */
-  async function withModel(response, run) {
+  /** Включить «AI» на время теста: fetch отвечает по очереди заданными ответами (последний — повторяется) */
+  async function withModel(responses, run) {
     const original = { ...config.ai };
+    const queue = [].concat(responses);
     Object.assign(config.ai, { baseUrl: 'http://ai.test', apiKey: 'test', model: 'test' });
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => response),
+      vi.fn(async () => (queue.length > 1 ? queue.shift() : queue[0])),
     );
     try {
       return await run();
@@ -130,6 +131,14 @@ describe('operator: с AI-ключом (ответ модели подменён
     expect(body.source).toBe('ai');
     expect(body.reply).toBe('Оформляю заказ воды.');
     expect(body.proposals[0]).toMatchObject({ status: 'pending', params: { product: 'Вода 1,5 л', quantity: 12 } });
+  });
+
+  it('перегрузка у провайдера (503) → одна повторная попытка, ответ всё равно от AI', async () => {
+    const busy = { ok: false, status: 503, text: async () => 'high demand' };
+    const message = { content: 'Сводка готова.', tool_calls: [] };
+    const ok = { ok: true, json: async () => ({ choices: [{ message }] }) };
+    const body = await withModel([busy, ok], async () => command(await adminAuth(), 'Что важно?'));
+    expect(body).toMatchObject({ source: 'ai', reply: 'Сводка готова.' });
   });
 
   it('модель недоступна → отвечаем по правилам, демо не падает', async () => {

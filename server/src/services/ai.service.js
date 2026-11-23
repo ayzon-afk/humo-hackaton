@@ -5,8 +5,12 @@ import { config } from '../config.js';
 
 export const aiEnabled = () => Boolean(config.ai.baseUrl && config.ai.apiKey && config.ai.model);
 
+// Перегрузка или лимит у провайдера обычно проходят за секунду — один раз пробуем снова
+const RETRY_STATUSES = new Set([429, 500, 502, 503]);
+const RETRY_DELAY_MS = 800;
+
 /** Запрос к модели. Возвращает message целиком: в нём content и, если были tools, tool_calls. */
-async function callModel({ messages, model = config.ai.model, json = false, tools }) {
+async function callModel({ messages, model = config.ai.model, json = false, tools }, attempt = 1) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), config.ai.timeoutMs);
   try {
@@ -25,6 +29,11 @@ async function callModel({ messages, model = config.ai.model, json = false, tool
         ...(tools?.length ? { tools } : {}),
       }),
     });
+    if (!res.ok && attempt === 1 && RETRY_STATUSES.has(res.status)) {
+      clearTimeout(timer);
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      return callModel({ messages, model, json, tools }, attempt + 1);
+    }
     if (!res.ok) throw new Error(`AI ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const data = await res.json();
     return data.choices?.[0]?.message ?? {};
