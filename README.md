@@ -63,3 +63,8 @@ Socket-события: `<collection>:created | updated | deleted`
 - `docs/DAY_PLAN.md` — тайминг дня и чек-лист
 - `docs/IDEA_CANVAS.md` — заполнить, как только объявят тему
 - `docs/PITCH.md` — структура питча на 3 минуты + ответы жюри
+
+## ?? ����
+
+https://humo-hackaton-production.up.railway.app � ����������� ������������� ����� `git push`
+
