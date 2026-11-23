@@ -1,17 +1,75 @@
 /* Статус = цветная точка + текст. Без пастельных плашек. */
-.status { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-sm); color: var(--text); white-space: nowrap; }
-.status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--dot, var(--text-tertiary)); }
-.status[data-tone='info'] { --dot: var(--accent); }
-.status[data-tone='warning'] { --dot: var(--warning); }
-.status[data-tone='success'] { --dot: var(--success); }
-.status[data-tone='danger'] { --dot: var(--danger); }
-button.status { background: none; border: 0; padding: 4px 8px; margin: -4px -8px; border-radius: var(--radius-sm); font: inherit; font-size: var(--fs-sm); cursor: pointer; }
-button.status:hover { background: var(--surface-hover); }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  white-space: nowrap;
+}
+.status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot, var(--text-tertiary));
+}
+.status[data-tone='info'] {
+  --dot: var(--accent);
+}
+.status[data-tone='warning'] {
+  --dot: var(--warning);
+}
+.status[data-tone='success'] {
+  --dot: var(--success);
+}
+.status[data-tone='danger'] {
+  --dot: var(--danger);
+}
+button.status {
+  background: none;
+  border: 0;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+button.status:hover {
+  background: var(--surface-hover);
+}
 
 /* Приоритет: 5 маленьких делений */
-.priority { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; }
-.priority i { width: 3px; border-radius: 1px; background: var(--hairline-strong); }
-.priority i:nth-child(1) { height: 4px; } .priority i:nth-child(2) { height: 6px; } .priority i:nth-child(3) { height: 8px; }
-.priority i:nth-child(4) { height: 10px; } .priority i:nth-child(5) { height: 12px; }
-.priority i.on { background: var(--text); }
-.priority.high i.on { background: var(--danger); }
+.priority {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 12px;
+}
+.priority i {
+  width: 3px;
+  border-radius: 1px;
+  background: var(--hairline-strong);
+}
+.priority i:nth-child(1) {
+  height: 4px;
+}
+.priority i:nth-child(2) {
+  height: 6px;
+}
+.priority i:nth-child(3) {
+  height: 8px;
+}
+.priority i:nth-child(4) {
+  height: 10px;
+}
+.priority i:nth-child(5) {
+  height: 12px;
+}
+.priority i.on {
+  background: var(--text);
+}
+.priority.high i.on {
+  background: var(--danger);
+}

@@ -18,20 +18,25 @@ function demoItems(n = 24) {
       lat: CENTER[0] + (Math.random() - 0.5) * 0.12,
       lng: CENTER[1] + (Math.random() - 0.5) * 0.16,
       createdAt: new Date(Date.now() - daysAgo * 86400000).toISOString(),
+      history: [{ type: 'created', by: 'Демо', at: new Date(Date.now() - daysAgo * 86400000).toISOString() }],
     };
   });
 }
 
+const DEMO_USERS = [
+  { name: 'Admin', email: 'admin@demo.uz', role: 'admin', password: 'admin123' },
+  { name: 'Малика Рахимова', email: 'malika@demo.uz', role: 'manager', password: 'demo123' },
+  { name: 'Тимур Алиев', email: 'timur@demo.uz', role: 'user', password: 'demo123' },
+];
+
+/** Создаёт демо-пользователей и демо-данные, если их ещё нет. reset — пересоздать всё. */
 export function ensureSeed({ reset = false } = {}) {
   const users = collection('users');
   if (reset) users.clear();
-  if (!users.findOne((u) => u.email === 'admin@demo.uz')) {
-    users.insert({
-      name: 'Admin',
-      email: 'admin@demo.uz',
-      role: 'admin',
-      passwordHash: bcrypt.hashSync('admin123', 10),
-    });
+  for (const { password, ...user } of DEMO_USERS) {
+    if (!users.findOne((u) => u.email === user.email)) {
+      users.insert({ ...user, passwordHash: bcrypt.hashSync(password, 10) });
+    }
   }
 
   for (const name of config.collections) {

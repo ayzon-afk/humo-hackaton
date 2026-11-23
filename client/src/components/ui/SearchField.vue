@@ -9,6 +9,13 @@ defineEmits(['submit']);
 <template>
   <label class="search">
     <Search aria-hidden="true" />
-    <input v-model="model" type="search" class="input" :placeholder="placeholder" :aria-label="placeholder" @keydown.enter="$emit('submit', model)" />
+    <input
+      v-model="model"
+      type="search"
+      class="input"
+      :placeholder="placeholder"
+      :aria-label="placeholder"
+      @keydown.enter="$emit('submit', model)"
+    />
   </label>
 </template>

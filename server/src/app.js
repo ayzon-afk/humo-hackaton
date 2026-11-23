@@ -5,10 +5,14 @@ import cors from 'cors';
 import { config } from './config.js';
 import { apiRouter } from './routes/index.js';
 import { apiNotFound, errorHandler } from './middleware/errorHandler.js';
+import { securityHeaders } from './middleware/security.js';
 
+/** Собирает Express-приложение без запуска сервера (удобно для тестов). */
 export function createApp() {
   const app = express();
 
+  app.disable('x-powered-by');
+  app.use(securityHeaders);
   app.use(cors());
   app.use(express.json({ limit: '10mb' }));
 

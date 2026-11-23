@@ -2,8 +2,13 @@ import { Router } from 'express';
 import { collection } from '../db/store.js';
 import { optionalAuth, requireAuth } from '../middleware/auth.js';
 import { emit } from '../realtime/socket.js';
+import { validate } from '../middleware/validate.js';
+import { itemCreateSchema, itemUpdateSchema } from '../validation/schemas.js';
 
 const SEARCH_FIELDS = ['title', 'description', 'category'];
+
+/** Запись в журнал изменений: кто, когда и что поменял */
+const historyEntry = (type, by, details = {}) => ({ type, by, at: new Date().toISOString(), ...details });
 
 function applyQuery(items, query) {
   const { q, sort = '-createdAt', limit, ...filters } = query;
@@ -13,7 +18,11 @@ function applyQuery(items, query) {
   if (q) {
     const needle = String(q).toLowerCase();
     result = result.filter((item) =>
-      SEARCH_FIELDS.some((f) => String(item[f] ?? '').toLowerCase().includes(needle)),
+      SEARCH_FIELDS.some((f) =>
+        String(item[f] ?? '')
+          .toLowerCase()
+          .includes(needle),
+      ),
     );
   }
   const desc = sort.startsWith('-');
@@ -35,17 +44,28 @@ export function createCrudRouter(name) {
     res.json(item);
   });
 
-  router.post('/', optionalAuth, (req, res) => {
-    const { id, createdAt, ...body } = req.body || {};
-    const item = col().insert({ status: 'new', ...body, userId: req.user?.id ?? null });
+  router.post('/', optionalAuth, validate(itemCreateSchema), (req, res) => {
+    const { id, createdAt, history, ...body } = req.body;
+    const author = req.user?.name ?? 'Гость';
+    const item = col().insert({
+      status: 'new',
+      ...body,
+      userId: req.user?.id ?? null,
+      history: [historyEntry('created', author)],
+    });
     emit(`${name}:created`, item);
     res.status(201).json(item);
   });
 
-  router.patch('/:id', requireAuth, (req, res) => {
-    const { id, createdAt, ...patch } = req.body || {};
-    const item = col().update(req.params.id, patch);
-    if (!item) return res.status(404).json({ error: 'Не найдено' });
+  router.patch('/:id', requireAuth, validate(itemUpdateSchema), (req, res) => {
+    const { id, createdAt, history, ...patch } = req.body;
+    const current = col().byId(req.params.id);
+    if (!current) return res.status(404).json({ error: 'Не найдено' });
+
+    const changes = Object.keys(patch)
+      .filter((field) => current[field] !== patch[field])
+      .map((field) => historyEntry('changed', req.user.name, { field, from: current[field], to: patch[field] }));
+    const item = col().update(req.params.id, { ...patch, history: [...(current.history ?? []), ...changes] });
     emit(`${name}:updated`, item);
     res.json(item);
   });

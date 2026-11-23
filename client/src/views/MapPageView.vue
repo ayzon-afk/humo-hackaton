@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-vue-next';
 import { useItemsStore } from '@/stores/items';
 import { useToast } from '@/composables/useToast';
 import { themeColors } from '@/components/charts/registerCharts';
-import { statusOrder, statusLabels, statusTone } from '@/config/labels';
+import { statusOrder, statusTone } from '@/config/labels';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import StatusLabel from '@/components/ui/StatusLabel.vue';
 import SheetPanel from '@/components/ui/SheetPanel.vue';
@@ -24,7 +24,11 @@ const formRef = ref(null);
 const toneColor = () => {
   const css = getComputedStyle(document.documentElement);
   const c = themeColors();
-  return { info: c.accent, warning: css.getPropertyValue('--warning').trim(), success: css.getPropertyValue('--success').trim() };
+  return {
+    info: c.accent,
+    warning: css.getPropertyValue('--warning').trim(),
+    success: css.getPropertyValue('--success').trim(),
+  };
 };
 const points = computed(() => {
   const colors = toneColor();
@@ -67,7 +71,9 @@ onMounted(() => {
       </div>
 
       <aside class="card self-start">
-        <div class="card-header"><span class="card-title">{{ selected ? 'Выбрано' : 'Легенда' }}</span></div>
+        <div class="card-header">
+          <span class="card-title">{{ selected ? 'Выбрано' : 'Легенда' }}</span>
+        </div>
         <div v-if="selected" class="card-body flex flex-col gap-3">
           <div class="font-medium">{{ selected.title }}</div>
           <p class="text-sm text-secondary">{{ selected.description || 'Без описания' }}</p>
@@ -79,7 +85,9 @@ onMounted(() => {
             <StatusLabel :status="s" class="flex-1" />
             <span class="num text-sm text-secondary">{{ items.filter((x) => x.status === s).length }}</span>
           </li>
-          <li class="list-row text-xs text-tertiary"><MapPin class="w-4 h-4" aria-hidden="true" />{{ items.length }} точек на карте</li>
+          <li class="list-row text-xs text-tertiary">
+            <MapPin class="w-4 h-4" aria-hidden="true" />{{ items.length }} точек на карте
+          </li>
         </ul>
       </aside>
     </div>

@@ -1,20 +1,81 @@
-.table-wrap { overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
-.table th {
-  text-align: left; font-weight: 500; font-size: var(--fs-xs); color: var(--text-tertiary);
-  padding: 10px var(--space-4); border-bottom: 1px solid var(--hairline); white-space: nowrap;
+.table-wrap {
+  overflow-x: auto;
 }
-.table th:first-child, .table td:first-child { padding-left: var(--space-6); }
-.table th:last-child, .table td:last-child { padding-right: var(--space-6); }
-.table td { padding: 14px var(--space-4); border-bottom: 1px solid var(--hairline); vertical-align: middle; }
-.table tr:last-child td { border-bottom: 0; }
-.table tbody tr { transition: background var(--dur-fast) var(--ease); }
-.table tbody tr:hover { background: var(--surface-hover); }
-.table .row-actions { opacity: 0; transition: opacity var(--dur-fast) var(--ease); }
-.table tbody tr:hover .row-actions, .table .row-actions:focus-within { opacity: 1; }
-.cell-title { font-weight: 500; color: var(--text); }
-.cell-sub { font-size: var(--fs-xs); color: var(--text-tertiary); margin-top: 2px; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+.table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  padding: 10px var(--space-4);
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+.table th:first-child,
+.table td:first-child {
+  padding-left: var(--space-6);
+}
+.table th:last-child,
+.table td:last-child {
+  padding-right: var(--space-6);
+}
+.table td {
+  padding: 14px var(--space-4);
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: middle;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table tbody tr {
+  transition: background var(--dur-fast) var(--ease);
+}
+.table tbody tr:hover {
+  background: var(--surface-hover);
+}
+.table .row-actions {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.table tbody tr:hover .row-actions,
+.table .row-actions:focus-within {
+  opacity: 1;
+}
+.cell-title {
+  font-weight: 500;
+  color: var(--text);
+}
+.cell-sub {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* Новая строка мягко подсвечивается (realtime) */
-@keyframes row-flash { from { background: var(--accent-soft); } to { background: transparent; } }
-.row-new { animation: row-flash 1.6s var(--ease) 1; }
+@keyframes row-flash {
+  from {
+    background: var(--accent-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+.row-new {
+  animation: row-flash 1.6s var(--ease) 1;
+}
+.cell-link {
+  display: inline-block;
+  color: var(--text);
+}
+.cell-link:hover {
+  color: var(--accent-text);
+  text-decoration: none;
+}

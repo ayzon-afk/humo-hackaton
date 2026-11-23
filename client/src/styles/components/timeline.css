@@ -1,0 +1,86 @@
+/* Журнал изменений: вертикальная линия с точками */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 var(--space-5) var(--space-6);
+}
+.timeline li:last-child {
+  padding-bottom: 0;
+}
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.timeline li::after {
+  content: '';
+  position: absolute;
+  left: 7.5px;
+  top: 18px;
+  bottom: 0;
+  width: 1px;
+  background: var(--hairline-strong);
+}
+.timeline li:last-child::after {
+  display: none;
+}
+.timeline .when {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+/* Пары «название — значение» */
+.props {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px var(--space-4);
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+.props dt {
+  color: var(--text-secondary);
+}
+.props dd {
+  margin: 0;
+  text-align: right;
+  color: var(--text);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-3);
+}
+.back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Ответ AI */
+.ai-result {
+  padding: var(--space-4);
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ai-result strong {
+  color: var(--accent-text);
+  font-weight: 600;
+}

@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-vue-next';
 import { statsApi } from '@/api/stats';
 import { crudApi } from '@/api/crud';
 import { project } from '@/config/project';
-import { statusLabels, statusOrder, categoryLabels } from '@/config/labels';
+import { statusOrder, categoryLabels } from '@/config/labels';
 import { getSocket } from '@/realtime/socket';
 import { useAuthStore } from '@/stores/auth';
 import { greeting, todayLabel } from '@/composables/useGreeting';
@@ -57,7 +57,8 @@ onBeforeUnmount(() => events.forEach((e) => getSocket().off(e, load)));
     <PageHeader :title="`${greeting()}, ${auth.user?.name || ''}`" :subtitle="todayLabel()" />
 
     <div v-if="!stats" class="grid gap-4 lg:grid-cols-3">
-      <div class="card skeleton h-72 lg:col-span-2" /><div class="card skeleton h-72" />
+      <div class="card skeleton h-72 lg:col-span-2" />
+      <div class="card skeleton h-72" />
     </div>
 
     <div v-else class="grid gap-4 lg:grid-cols-3">
@@ -83,7 +84,10 @@ onBeforeUnmount(() => events.forEach((e) => getSocket().off(e, load)));
               </div>
             </div>
           </div>
-          <LineChart :labels="stats.timeline.map((d) => d.day.slice(8) + '.' + d.day.slice(5, 7))" :values="stats.timeline.map((d) => d.count)" />
+          <LineChart
+            :labels="stats.timeline.map((d) => d.day.slice(8) + '.' + d.day.slice(5, 7))"
+            :values="stats.timeline.map((d) => d.count)"
+          />
         </div>
       </section>
 
@@ -97,7 +101,9 @@ onBeforeUnmount(() => events.forEach((e) => getSocket().off(e, load)));
           </li>
         </ul>
         <div class="card-body mt-auto">
-          <div class="flex justify-between text-xs text-tertiary mb-2"><span>Прогресс решения</span><span class="num">{{ doneRate }}%</span></div>
+          <div class="flex justify-between text-xs text-tertiary mb-2">
+            <span>Прогресс решения</span><span class="num">{{ doneRate }}%</span>
+          </div>
           <div class="bar accent"><span :style="{ width: doneRate + '%' }" /></div>
         </div>
       </section>

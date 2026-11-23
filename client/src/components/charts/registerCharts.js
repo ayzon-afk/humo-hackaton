@@ -1,13 +1,4 @@
-import {
-  Chart,
-  BarElement,
-  CategoryScale,
-  Filler,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-} from 'chart.js';
+import { Chart, BarElement, CategoryScale, Filler, LinearScale, LineElement, PointElement, Tooltip } from 'chart.js';
 
 Chart.register(BarElement, CategoryScale, Filler, LinearScale, LineElement, PointElement, Tooltip);
 
@@ -46,8 +37,16 @@ export function baseOptions(c) {
       },
     },
     scales: {
-      x: { grid: { display: false }, border: { display: false }, ticks: { color: c.muted, font: { family: c.font, size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 7 } },
-      y: { grid: { color: c.grid }, border: { display: false }, ticks: { color: c.muted, font: { family: c.font, size: 11 }, precision: 0, maxTicksLimit: 5 } },
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { color: c.muted, font: { family: c.font, size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 7 },
+      },
+      y: {
+        grid: { color: c.grid },
+        border: { display: false },
+        ticks: { color: c.muted, font: { family: c.font, size: 11 }, precision: 0, maxTicksLimit: 5 },
+      },
     },
   };
 }

@@ -1,31 +1,101 @@
-.field { display: flex; flex-direction: column; gap: 6px; }
-.label { font-size: var(--fs-xs); font-weight: 500; color: var(--text-secondary); }
-.hint { font-size: var(--fs-xs); color: var(--text-tertiary); }
-.error-text { font-size: var(--fs-xs); color: var(--danger-text); }
-
-.input, .select, .textarea {
-  width: 100%; box-sizing: border-box;
-  height: var(--control-h); padding: 0 12px;
-  background: var(--surface); color: var(--text);
-  border: 1px solid var(--hairline-strong); border-radius: var(--radius-md);
-  font: inherit; font-size: var(--fs-sm);
-  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.textarea { height: auto; min-height: 88px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
-.input::placeholder, .textarea::placeholder { color: var(--text-tertiary); }
-.input:hover, .select:hover, .textarea:hover { border-color: var(--text-tertiary); }
-.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+.label {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+.error-text {
+  font-size: var(--fs-xs);
+  color: var(--danger-text);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--control-h);
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--fs-sm);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.textarea {
+  height: auto;
+  min-height: 88px;
+  padding: 10px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-tertiary);
+}
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--text-tertiary);
+}
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
 
 .select {
-  appearance: none; padding-right: 32px; cursor: pointer;
+  appearance: none;
+  padding-right: 32px;
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2386868b' stroke-width='1.75' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
 }
 
 /* Поиск — единственный инпут с иконкой (она функциональная) */
-.search { position: relative; }
-.search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-tertiary); pointer-events: none; }
-.search .input { padding-left: 36px; height: 36px; background: var(--surface); border-color: transparent; box-shadow: var(--shadow-card); border-radius: 11px; }
-.search .input:hover { border-color: transparent; }
-.search .input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
-.search:focus-within svg { color: var(--accent); }
+.search {
+  position: relative;
+}
+.search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+.search .input {
+  padding-left: 36px;
+  height: 36px;
+  background: var(--surface);
+  border-color: transparent;
+  box-shadow: var(--shadow-card);
+  border-radius: 11px;
+}
+.search .input:hover {
+  border-color: transparent;
+}
+.search .input:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+.search:focus-within svg {
+  color: var(--accent);
+}

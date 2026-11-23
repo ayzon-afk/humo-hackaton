@@ -2,14 +2,15 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { LogOut } from 'lucide-vue-next';
-import { navLinks } from '@/config/nav';
+import { navSections } from '@/config/nav';
+import { initials as toInitials } from '@/composables/useFormat';
 import { project } from '@/config/project';
 import { useAuthStore } from '@/stores/auth';
 import ThemeToggle from '@/components/ui/ThemeToggle.vue';
 
 const auth = useAuthStore();
 const router = useRouter();
-const initials = computed(() => (auth.user?.name || '?').slice(0, 2).toUpperCase());
+const initials = computed(() => toInitials(auth.user?.name));
 
 function logout() {
   auth.logout();
@@ -24,11 +25,21 @@ function logout() {
       <span class="brand-name">{{ project.name }}</span>
     </RouterLink>
 
-    <nav class="nav">
-      <RouterLink v-for="link in navLinks" :key="link.to" :to="link.to" class="nav-link" exact-active-class="active">
-        <component :is="link.icon" aria-hidden="true" />
-        {{ link.label }}
-      </RouterLink>
+    <nav class="nav" aria-label="Основное меню">
+      <template v-for="group in navSections" :key="group.section">
+        <div class="nav-section">{{ group.section }}</div>
+        <RouterLink
+          v-for="link in group.links"
+          :key="link.to"
+          :to="link.to"
+          class="nav-link"
+          :exact-active-class="link.exact ? 'active' : ''"
+          :active-class="link.exact ? '' : 'active'"
+        >
+          <component :is="link.icon" aria-hidden="true" />
+          {{ link.label }}
+        </RouterLink>
+      </template>
     </nav>
 
     <div class="sidebar-footer">

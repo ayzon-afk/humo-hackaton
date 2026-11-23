@@ -3,6 +3,7 @@ import { Trash2 } from 'lucide-vue-next';
 import { categoryLabels, statusOrder } from '@/config/labels';
 import StatusLabel from '@/components/ui/StatusLabel.vue';
 import PriorityMeter from '@/components/ui/PriorityMeter.vue';
+import { formatDate as date } from '@/composables/useFormat';
 
 defineProps({
   items: { type: Array, default: () => [] },
@@ -11,7 +12,6 @@ defineProps({
 const emit = defineEmits(['status', 'remove']);
 
 const next = (s) => statusOrder[(statusOrder.indexOf(s) + 1) % statusOrder.length];
-const date = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 </script>
 
 <template>
@@ -30,7 +30,7 @@ const date = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric'
       <tbody>
         <tr v-for="item in items" :key="item.id" :class="{ 'row-new': freshIds.has(item.id) }">
           <td>
-            <div class="cell-title">{{ item.title }}</div>
+            <RouterLink :to="`/app/items/${item.id}`" class="cell-title cell-link">{{ item.title }}</RouterLink>
             <div v-if="item.description" class="cell-sub">{{ item.description }}</div>
           </td>
           <td class="text-secondary">{{ categoryLabels[item.category] || item.category }}</td>
@@ -39,7 +39,14 @@ const date = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric'
           <td class="text-tertiary num">{{ date(item.createdAt) }}</td>
           <td class="text-right">
             <span class="row-actions">
-              <button class="btn btn-danger btn-icon btn-sm" aria-label="Удалить" title="Удалить" @click="emit('remove', item)"><Trash2 /></button>
+              <button
+                class="btn btn-danger btn-icon btn-sm"
+                aria-label="Удалить"
+                title="Удалить"
+                @click="emit('remove', item)"
+              >
+                <Trash2 />
+              </button>
             </span>
           </td>
         </tr>

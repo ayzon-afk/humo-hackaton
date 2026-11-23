@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { config } from '../config.js';
 import { aiEnabled } from '../services/ai.service.js';
 import { authRouter } from './auth.routes.js';
+import { usersRouter } from './users.routes.js';
 import { aiRouter } from './ai.routes.js';
 import { uploadRouter } from './upload.routes.js';
 import { statsRouter } from './stats.routes.js';
@@ -15,6 +16,7 @@ export function apiRouter() {
   );
 
   router.use('/auth', authRouter);
+  router.use('/users', usersRouter);
   router.use('/ai', aiRouter);
   router.use('/upload', uploadRouter);
   router.use('/stats', statsRouter);

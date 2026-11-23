@@ -53,7 +53,10 @@ async function safely(fn, fallback) {
 }
 
 /** Диалог. messages: [{ role: 'user'|'assistant', content }] */
-export function chat({ messages = [], system = 'Ты полезный ассистент. Отвечай кратко и по делу на языке пользователя.' }) {
+export function chat({
+  messages = [],
+  system = 'Ты полезный ассистент. Отвечай кратко и по делу на языке пользователя.',
+}) {
   return safely(
     async () => ({ reply: await callModel({ messages: [{ role: 'system', content: system }, ...messages] }) }),
     { reply: 'DEMO: AI-ключ не задан. Добавь AI_API_KEY в server/.env — и здесь будет реальный ответ.' },
@@ -64,7 +67,17 @@ export function chat({ messages = [], system = 'Ты полезный ассис
 export function analyze({ text, instruction }) {
   const system = `Ты аналитик. ${instruction}\nВерни ТОЛЬКО валидный JSON без пояснений.`;
   return safely(
-    async () => ({ result: parseJson(await callModel({ json: true, messages: [{ role: 'system', content: system }, { role: 'user', content: text }] })) }),
+    async () => ({
+      result: parseJson(
+        await callModel({
+          json: true,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: text },
+          ],
+        }),
+      ),
+    }),
     { result: { category: 'city', priority: 3, summary: String(text || '').slice(0, 120), tags: ['demo'] } },
   );
 }

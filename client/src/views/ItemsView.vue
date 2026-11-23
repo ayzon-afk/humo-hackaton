@@ -26,11 +26,18 @@ const sheetOpen = ref(false);
 const saving = ref(false);
 const formRef = ref(null);
 
-watch(() => route.query.q, (v) => (q.value = v || ''));
+watch(
+  () => route.query.q,
+  (v) => (q.value = v || ''),
+);
 
 const filters = computed(() => [
   { value: null, label: 'Все', count: items.value.length },
-  ...statusOrder.map((s) => ({ value: s, label: statusLabels[s], count: items.value.filter((x) => x.status === s).length })),
+  ...statusOrder.map((s) => ({
+    value: s,
+    label: statusLabels[s],
+    count: items.value.filter((x) => x.status === s).length,
+  })),
 ]);
 
 const visible = computed(() => {
@@ -101,7 +108,12 @@ onMounted(() => {
       >
         <button class="btn btn-primary" @click="sheetOpen = true"><Plus aria-hidden="true" />Новая запись</button>
       </EmptyState>
-      <EmptyState v-else-if="!visible.length" :icon="SearchX" title="Ничего не найдено" text="Попробуйте другой запрос или фильтр." />
+      <EmptyState
+        v-else-if="!visible.length"
+        :icon="SearchX"
+        title="Ничего не найдено"
+        text="Попробуйте другой запрос или фильтр."
+      />
       <ItemTable v-else :items="visible" :fresh-ids="freshIds" @status="changeStatus" @remove="remove" />
     </section>
 

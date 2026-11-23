@@ -46,7 +46,9 @@ async function send(text = input.value) {
       <div v-if="loading" class="bubble assistant typing" aria-label="Печатает"><i /><i /><i /></div>
     </div>
     <div v-if="suggestions.length && messages.length === 1" class="suggestions">
-      <button v-for="s in suggestions" :key="s" class="btn btn-secondary btn-sm btn-pill" @click="send(s)">{{ s }}</button>
+      <button v-for="s in suggestions" :key="s" class="btn btn-secondary btn-sm btn-pill" @click="send(s)">
+        {{ s }}
+      </button>
     </div>
     <form class="composer" @submit.prevent="send()">
       <input v-model="input" class="input" placeholder="Сообщение" aria-label="Сообщение" />

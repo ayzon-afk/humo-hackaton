@@ -61,12 +61,31 @@ defineExpose({ validate, reset });
 <template>
   <div class="flex flex-col gap-6">
     <div class="flex flex-col gap-2">
-      <input v-model="form.title" class="title-input" placeholder="Название" aria-label="Название" autofocus @input="error = ''" />
-      <textarea v-model="form.description" class="textarea" rows="3" placeholder="Опишите ситуацию: что, где, когда" aria-label="Описание" />
+      <input
+        v-model="form.title"
+        class="title-input"
+        placeholder="Название"
+        aria-label="Название"
+        autofocus
+        @input="error = ''"
+      />
+      <textarea
+        v-model="form.description"
+        class="textarea"
+        rows="3"
+        placeholder="Опишите ситуацию: что, где, когда"
+        aria-label="Описание"
+      />
     </div>
 
     <div class="ai-assist">
-      <p>{{ aiDone ? 'Готово — проверьте категорию и приоритет' : 'AI сам определит категорию, приоритет и название по описанию' }}</p>
+      <p>
+        {{
+          aiDone
+            ? 'Готово — проверьте категорию и приоритет'
+            : 'AI сам определит категорию, приоритет и название по описанию'
+        }}
+      </p>
       <button type="button" class="btn btn-sm" :aria-busy="aiLoading" @click="autoFill">
         <span v-if="aiLoading" class="spinner" /><WandSparkles v-else aria-hidden="true" />
         Заполнить
@@ -83,7 +102,9 @@ defineExpose({ validate, reset });
       <SegmentedControl v-model="form.priority" :options="priorityOptions" block label="Приоритет" />
     </div>
 
-    <div v-if="form.lat" class="point-row"><MapPin aria-hidden="true" />{{ form.lat.toFixed(4) }}, {{ form.lng.toFixed(4) }}</div>
+    <div v-if="form.lat" class="point-row">
+      <MapPin aria-hidden="true" />{{ form.lat.toFixed(4) }}, {{ form.lng.toFixed(4) }}
+    </div>
     <p v-if="error" class="error-text">{{ error }}</p>
   </div>
 </template>

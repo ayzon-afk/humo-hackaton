@@ -9,6 +9,7 @@ import { themeColors } from '@/components/charts/registerCharts';
 const props = defineProps({
   points: { type: Array, default: () => [] },
   height: { type: String, default: '500px' },
+  focus: Boolean, // приблизить к единственной точке
 });
 const emit = defineEmits(['pick', 'select']);
 
@@ -35,6 +36,8 @@ function draw() {
       .on('click', () => emit('select', p))
       .addTo(layer);
   }
+  const first = props.points[0];
+  if (props.focus && first?.lat != null) map.setView([first.lat, first.lng], 15);
 }
 
 onMounted(() => {

@@ -1,0 +1,499 @@
+/* ============================================================
+   SCROLL-ИСТОРИЯ (как в видео): сцена «прилипает», прокрутка перематывает шаги.
+   ============================================================ */
+.story {
+  position: relative;
+}
+.story-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  justify-content: center;
+  padding: 68px 20px 20px;
+  box-sizing: border-box;
+}
+.story-frame {
+  width: min(1040px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 32px;
+  transition: background 700ms var(--ease);
+}
+
+/* Слои сцен: смена — через «зум», как переход к окну в видео */
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.06);
+  transition:
+    opacity 500ms var(--ease),
+    transform 800ms var(--ease-out);
+  pointer-events: none;
+}
+.scene-layer.before {
+  transform: scale(0.94);
+}
+.scene-layer.active {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.scene {
+  display: grid;
+  place-items: center;
+  padding: 32px 32px 72px;
+  box-sizing: border-box;
+}
+
+/* Карточка снизу */
+.story-card {
+  position: relative;
+  z-index: 2;
+  width: min(560px, calc(100% - 24px));
+  margin: -56px auto 0;
+  box-sizing: border-box;
+  background: var(--surface);
+  border-radius: 28px;
+  box-shadow: var(--shadow-pop);
+  padding: 22px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.story-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.story-number {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.story-label {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+}
+.story-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  margin: 0;
+}
+.story-caption {
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  white-space: normal;
+}
+
+.swap-enter-active,
+.swap-leave-active {
+  transition:
+    opacity 180ms var(--ease),
+    transform 220ms var(--ease-out);
+}
+.swap-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.swap-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Таймлайн с бегунком */
+.timeline-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 4px;
+}
+.timeline-track {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  height: 18px;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+.timeline-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) calc(25% + var(--seg) * 75%), #0b1a30 calc(var(--seg) * 40%));
+}
+.timeline-thumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 0.5px rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.timeline-track:hover .timeline-thumb,
+.timeline-track.dragging .timeline-thumb {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+.timeline-track:focus-visible {
+  border-radius: 9px;
+}
+.timeline-labels {
+  display: flex;
+}
+.timeline-labels button {
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: left;
+  cursor: pointer;
+}
+.timeline-labels button:hover {
+  color: var(--accent-text);
+}
+
+/* — Сцена 1: проблема — */
+.scene-problem {
+  position: absolute;
+  inset: 0;
+}
+.msg {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 34%;
+  padding: 10px 14px;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  transition:
+    opacity 400ms var(--ease),
+    transform 500ms var(--ease-out);
+}
+.msg.show {
+  opacity: 1;
+  transform: none;
+}
+.msg-text {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+.msg-meta {
+  font-size: 11px;
+  color: var(--danger-text);
+}
+.problem-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  max-width: 420px;
+}
+.problem-stat .stat-xl {
+  font-size: clamp(64px, 11vw, 128px);
+  color: var(--text);
+}
+.problem-text {
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+}
+
+/* — Сцена 2: приём — */
+.device {
+  width: min(340px, 100%);
+  background: var(--surface);
+  border-radius: 28px;
+  box-shadow: var(--shadow-pop);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.device-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.device-heading {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  transition: color var(--dur) var(--ease);
+}
+.device-heading.ghost {
+  color: var(--text-disabled);
+}
+.device-text {
+  min-height: 44px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -2px;
+  background: var(--accent);
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.device-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  transition: all var(--dur) var(--ease);
+}
+.device-ai svg {
+  width: 14px;
+  height: 14px;
+}
+.device-ai.working {
+  animation: pulse 0.9s var(--ease) infinite;
+}
+.device-ai.done {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 6px var(--accent-soft);
+  }
+}
+.device-chips {
+  display: flex;
+  gap: 6px;
+}
+.device-chips .chip {
+  height: 28px;
+  padding: 0 12px;
+  font-size: var(--fs-xs);
+  pointer-events: none;
+}
+.device-priority {
+  display: flex;
+  gap: 4px;
+}
+.device-priority span {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-active);
+  transition: background var(--dur) var(--ease);
+}
+.device-priority span.on {
+  background: var(--accent);
+}
+.device-priority span.on:nth-child(5) {
+  background: var(--danger);
+}
+.device-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--text);
+  color: var(--surface);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: background var(--dur) var(--ease);
+}
+.device-send svg {
+  width: 16px;
+  height: 16px;
+}
+.device-send.sent {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* — Сцена 3: карта — */
+.scene-map {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+}
+.map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.river {
+  fill: none;
+  stroke: #c3d8f2;
+  stroke-width: 22;
+  stroke-linecap: round;
+}
+.roads path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.roads .avenue {
+  stroke-width: 11;
+}
+.pin {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.3);
+  transition:
+    opacity 300ms var(--ease),
+    transform 450ms var(--ease-out);
+}
+.pin.show {
+  opacity: 1;
+  transform: none;
+}
+.pin-dot {
+  stroke: #fff;
+  stroke-width: 3;
+}
+.pin-pulse {
+  opacity: 0;
+}
+.pin.latest .pin-pulse {
+  animation: ping 1.6s var(--ease-out) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ping {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+.map-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+/* — Сцена 4: результат (ночь) — */
+.story-stage.night + .story-card {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+.insight-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+}
+.insight-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+.insight-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 120px;
+}
+.insight-bar {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+.insight-bar span {
+  width: 100%;
+  border-radius: 6px;
+  background: var(--accent);
+  transition: height 300ms var(--ease-out);
+}
+.insight-bar small {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 640px) {
+  .story-sticky {
+    padding: 60px 10px 10px;
+  }
+  .story-stage {
+    border-radius: 24px;
+  }
+  .story-card {
+    padding: 18px 18px 20px;
+    gap: 10px;
+    margin-top: -40px;
+  }
+  .story-number {
+    font-size: 36px;
+  }
+  .msg {
+    max-width: 46%;
+    padding: 8px 12px;
+  }
+  .scene {
+    padding: 20px 16px 56px;
+  }
+}

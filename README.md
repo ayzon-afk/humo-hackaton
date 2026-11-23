@@ -1,75 +1,78 @@
-# 🚀 Humo Arena Hackathon — стартовый шаблон AYZON
+# PROJECT NAME
 
-Готовый фундамент, чтобы завтра тратить время **на идею и вау-фичу**, а не на настройку.
+[![CI](https://github.com/ayzon-afk/humo-hackaton/actions/workflows/ci.yml/badge.svg)](https://github.com/ayzon-afk/humo-hackaton/actions/workflows/ci.yml)
 
-**Стек:** Vue 3 + Vite + Tailwind 4 (только сетка) + свой дизайн в стиле Apple + Lucide + Inter + Pinia · Express 5 + JWT + Socket.io · AI через любой OpenAI-совместимый API · Leaflet-карта Ташкента · Chart.js
+> Одна фраза: какую проблему решаем и для кого. _(заполняется в день хакатона)_
 
-## ⚡ Запуск (2 команды)
+**Демо:** https://humo-hackaton-production.up.railway.app · логин `admin@demo.uz` / `admin123`
+
+Команда **AYZON** · Humo Arena Hackathon 2026
+
+---
+
+## Возможности
+
+- **CRM-система** — обзор с трендами, таблица с фильтрами и поиском, карточка записи с историей изменений, карта, команда и роли, настройки
+- **AI** — автозаполнение формы по описанию, анализ записи, чат-ассистент. Без ключа работает в демо-режиме и не падает
+- **Реальное время** — изменения появляются у всех пользователей мгновенно (WebSocket)
+- **Сайт** — лендинг со scroll-историей: прокрутка перематывает сцены работы продукта
+- **Дизайн в стиле Apple** — светлая и тёмная темы, единые токены, адаптив до 375px
+
+## Стек
+
+| Слой     | Технологии                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------- |
+| Клиент   | Vue 3 (Composition API), Vite, Pinia, Vue Router, Tailwind 4 (только сетка), Lucide, Inter, Chart.js, Leaflet |
+| Сервер   | Node.js, Express 5, Socket.io, JWT, bcrypt, Zod, Helmet, express-rate-limit                                   |
+| Качество | ESLint, Prettier, Vitest + Supertest, GitHub Actions                                                          |
+| Деплой   | Railway (один сервис: API + WebSocket + фронт)                                                                |
+
+## Быстрый старт
 
 ```bash
-npm run install:all
-npm run dev
+npm run install:all   # зависимости корня, сервера и клиента
+npm run dev           # сервер :5000 + клиент :5173
 ```
 
-- Фронт: http://localhost:5173 (логин уже подставлен: `admin@demo.uz` / `admin123`)
-- API: http://localhost:5000/api/health
-- С телефона в той же Wi-Fi: `http://<IP-ноутбука>:5173`
+## Команды
 
-## 🤖 Подключить AI
+| Команда                               | Что делает                                  |
+| ------------------------------------- | ------------------------------------------- |
+| `npm run dev`                         | Запуск для разработки                       |
+| `npm run check`                       | Линтер + формат + тесты + сборка (как в CI) |
+| `npm test`                            | Тесты API                                   |
+| `npm run lint:fix` / `npm run format` | Автоисправление стиля кода                  |
+| `npm run seed`                        | Пересоздать демо-данные                     |
+| `npm run deploy`                      | Коммит + push на GitHub + деплой на Railway |
 
-В `server/.env` заполни `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL` (примеры провайдеров там же).
-Без ключа всё работает в **DEMO-режиме** — демо на сцене не упадёт, даже если AI отвалится.
+## Адаптация под тему (15 минут)
 
-## 🧩 Что уже есть
+1. `client/src/config/project.js` — название, слоган, цифра проблемы, возможности
+2. `client/src/config/story.js` — шаги scroll-истории на сайте
+3. `client/src/config/labels.js` — статусы и категории
+4. `server/.env` → `COLLECTIONS=` — своя сущность (и `project.mainCollection`)
+5. `server/src/db/seed.js` — реалистичные демо-данные → `npm run seed`
 
-| Готово | Где |
-|---|---|
-| Лендинг под питч (название, слоган, цифра проблемы) | `client/src/config/project.js` |
-| Логин / регистрация / роли (JWT) | `server/src/routes/auth.routes.js` |
-| Универсальный CRUD для любой сущности | `COLLECTIONS=` в `server/.env` |
-| Realtime: данные появляются у всех сами | `server/src/realtime/socket.js` |
-| Дашборд со статистикой и графиками | `client/src/views/DashboardView.vue` |
-| Карта Ташкента: клик → добавить точку | `client/src/views/MapPageView.vue` |
-| AI-чат, AI-анализ текста → JSON, AI-анализ фото | `server/src/services/ai.service.js` |
-| Загрузка файлов | `POST /api/upload` |
-| Деплой одним сервисом (Render) | `render.yaml` |
+## AI
 
-## 🔁 Как адаптировать под тему за 15 минут
+`server/.env`: `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL` — любой OpenAI-совместимый провайдер (Gemini, Groq, OpenAI, OpenRouter). Примеры — в `server/.env.example`.
 
-1. `client/src/config/project.js` — название, слоган, цифра проблемы, фичи.
-2. `server/.env` → `COLLECTIONS=reports` (своя сущность) + то же в `project.mainCollection`.
-3. `client/src/config/labels.js` — статусы и категории под тему.
-4. `client/src/config/nav.js` — пункты меню.
-5. `server/src/db/seed.js` — реалистичные демо-данные → `npm run seed`.
-6. Системный промпт AI в `client/src/views/AiView.vue`.
-
-## 📡 API
+## API
 
 ```
-POST /api/auth/login | /api/auth/register      GET /api/auth/me
-GET  /api/:collection?status=new&q=яма&limit=10&sort=-createdAt
-GET|PATCH|DELETE /api/:collection/:id           POST /api/:collection
+POST /api/auth/login | /api/auth/register        GET /api/auth/me
+GET  /api/users        POST /api/users (admin)    PATCH /api/users/:id (admin)
+GET  /api/:collection?status=new&q=текст&limit=10&sort=-createdAt
+GET|PATCH|DELETE /api/:collection/:id             POST /api/:collection
 GET  /api/stats/:collection
-POST /api/ai/chat     { messages:[{role,content}], system }
-POST /api/ai/analyze  { text, instruction }  → { result: {...} }
-POST /api/ai/vision   multipart: image, prompt → { result: {...} }
-POST /api/upload      multipart: file → { url }
+POST /api/ai/chat | /api/ai/analyze | /api/ai/vision
+POST /api/upload                                  GET /api/health
 ```
 
-Socket-события: `<collection>:created | updated | deleted`
+WebSocket: `<collection>:created | updated | deleted`
 
-## 🎨 Дизайн
+## Документация
 
-- `client/src/styles/tokens.css` — все цвета, шрифты, отступы (меняешь здесь → меняется везде)
-- `docs/STYLE_CRM.md` — правила интерфейса системы
-- `docs/STYLE_WEBSITE.md` — правила сайта/лендинга
-
-## 📚 Документы на день хакатона
-
-- `docs/DAY_PLAN.md` — тайминг дня и чек-лист
-- `docs/IDEA_CANVAS.md` — заполнить, как только объявят тему
-- `docs/PITCH.md` — структура питча на 3 минуты + ответы жюри
-
-## 🌐 Прод
-
-https://humo-hackaton-production.up.railway.app — обновить: `npm run deploy` (push на GitHub + деплой на Railway)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [Стиль CRM](docs/STYLE_CRM.md) · [Стиль сайта](docs/STYLE_WEBSITE.md)
+- [План дня](docs/DAY_PLAN.md) · [Разбор темы](docs/IDEA_CANVAS.md) · [Питч](docs/PITCH.md)

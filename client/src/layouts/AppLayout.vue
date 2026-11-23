@@ -6,7 +6,10 @@ import Topbar from '@/components/layout/Topbar.vue';
 
 const navOpen = ref(false);
 const route = useRoute();
-watch(() => route.fullPath, () => (navOpen.value = false));
+watch(
+  () => route.fullPath,
+  () => (navOpen.value = false),
+);
 </script>
 
 <template>

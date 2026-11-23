@@ -1,7 +1,9 @@
 {
   "name": "humo-hackathon",
   "private": true,
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "version": "1.0.0",
   "description": "AYZON hackathon starter: Vue 3 + Express + AI + realtime",
   "scripts": {
@@ -10,10 +12,22 @@
     "build": "npm install --prefix server --include=dev && npm install --prefix client --include=dev && npm run build --prefix client",
     "start": "npm start --prefix server",
     "seed": "npm run seed --prefix server",
-    "deploy": "node scripts/deploy.mjs"
+    "deploy": "node scripts/deploy.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm test --prefix server",
+    "check": "npm run lint && npm run format:check && npm test && npm run build"
   },
   "devDependencies": {
-    "concurrently": "^9.2.0"
-  }
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.2.0",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1"
+  },
+  "type": "module"
 }
-

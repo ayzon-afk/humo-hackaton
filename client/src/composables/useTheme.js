@@ -21,5 +21,6 @@ export function initTheme() {
 
 export function useTheme() {
   const toggle = () => apply(theme.value === 'dark' ? 'light' : 'dark');
-  return { theme, toggle };
+  const setTheme = (value) => apply(value === 'dark' ? 'dark' : 'light');
+  return { theme, toggle, setTheme };
 }
