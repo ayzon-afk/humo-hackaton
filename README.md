@@ -66,5 +66,5 @@ Socket-СЃРѕР±С‹С‚РёСЏ: `<collection>:created | updated | deleted`
 
 ## ?? Прод
 
-https://humo-hackaton-production.up.railway.app — обновляется автоматически после `git push`
+https://humo-hackaton-production.up.railway.app — обновить: `npm run deploy` (push на GitHub + деплой на Railway)
 
