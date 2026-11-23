@@ -1,6 +1,7 @@
 {
   "name": "humo-hackathon",
   "private": true,
+  "engines": { "node": ">=20" },
   "version": "1.0.0",
   "description": "AYZON hackathon starter: Vue 3 + Express + AI + realtime",
   "scripts": {
@@ -14,3 +15,4 @@
     "concurrently": "^9.2.0"
   }
 }
+
