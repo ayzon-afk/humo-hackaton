@@ -13,6 +13,7 @@
 ## Возможности
 
 - **CRM-система** — обзор с трендами, таблица с фильтрами и поиском, карточка записи с историей изменений, карта, команда и роли, настройки
+- **AI-агент** — круглосуточно следит за данными, поднимает тревоги и каждый день сам присылает отчёт руководителю (в CRM и Telegram)
 - **AI** — автозаполнение формы по описанию, анализ записи, чат-ассистент. Без ключа работает в демо-режиме и не падает
 - **Реальное время** — изменения появляются у всех пользователей мгновенно (WebSocket)
 - **Сайт** — лендинг со scroll-историей: прокрутка перематывает сцены работы продукта
@@ -65,14 +66,16 @@ GET  /api/users        POST /api/users (admin)    PATCH /api/users/:id (admin)
 GET  /api/:collection?status=new&q=текст&limit=10&sort=-createdAt
 GET|PATCH|DELETE /api/:collection/:id             POST /api/:collection
 GET  /api/stats/:collection
+GET  /api/agent/status | /api/agent/reports      POST /api/agent/run
 POST /api/ai/chat | /api/ai/analyze | /api/ai/vision
 POST /api/upload                                  GET /api/health
 ```
 
-WebSocket: `<collection>:created | updated | deleted`
+WebSocket: `<collection>:created | updated | deleted`, `agent:report`, `agent:alert`
 
 ## Документация
 
 - [Архитектура](docs/ARCHITECTURE.md)
-- [Стиль CRM](docs/STYLE_CRM.md) · [Стиль сайта](docs/STYLE_WEBSITE.md)
-- [План дня](docs/DAY_PLAN.md) · [Разбор темы](docs/IDEA_CANVAS.md) · [Питч](docs/PITCH.md)
+- [Задача хакатона](kit/00-task/TASK.md) · [Всё о проекте — kit/](kit/README.md)
+- [Стиль CRM](kit/02-design/STYLE_CRM.md) · [Стиль сайта](kit/02-design/STYLE_WEBSITE.md)
+- [AI-агент](kit/05-ai-agent/AI_AGENT.md) · [Правила кода](kit/06-code-rules/CODE_RULES.md) · [Питч](kit/08-pitch/PITCH.md)

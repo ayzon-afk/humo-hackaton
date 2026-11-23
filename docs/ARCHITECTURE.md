@@ -8,6 +8,7 @@
 │ components/ UI-кит, CRM-блоки, сайт, сцены        │ ─────▶ │ middleware/  auth, validate, security      │
 │ stores/     Pinia: auth, items                    │        │ validation/  zod-схемы входных данных      │
 │ api/        axios-клиенты по ресурсам             │ ◀───── │ services/    бизнес-логика (auth, ai)      │
+│                                                   │        │ agent/       мониторинг, тревоги, отчёты   │
 │ composables/ тема, тосты, формат, scroll-прогресс │  WS    │ db/          JSON-хранилище + seed         │
 │ styles/     tokens → base → components → site     │        │ realtime/    socket.io события             │
 └───────────────────────────────────────────────────┘        └────────────────────────────────────────────┘
@@ -49,8 +50,9 @@ client/src/
 │  ├─ charts/     LineChart, BreakdownList
 │  ├─ map/        MapView (Leaflet)
 │  ├─ ai/         AiChat, ChatMessage
+│  ├─ agent/      ReportCard, AlertList
 │  └─ site/       SiteNav, SiteHero, StoryScroll, StoryCard, StoryTimeline, scenes/*
-└─ views/         Landing, Login, Dashboard, Items, ItemDetail, Map, Ai, Team, Settings
+└─ views/         Landing, Login, Dashboard, Items, ItemDetail, Map, Agent, Ai, Team, Settings
 ```
 
 ## Качество
@@ -60,5 +62,5 @@ npm run check   # lint + формат + тесты + сборка — то же 
 ```
 
 - **ESLint** (`eslint.config.js`) + **Prettier** (`.prettierrc.json`) + `.editorconfig`
-- **Тесты API** — Vitest + Supertest (`server/tests`): авторизация, валидация, CRUD, история, права, AI-фолбэк, заголовки безопасности
+- **Тесты API** — Vitest + Supertest (`server/tests`): авторизация, валидация, CRUD, история, права, AI-фолбэк, агент (метрики, правила, расписание), заголовки безопасности
 - **CI** — `.github/workflows/ci.yml` запускает всё на каждый push

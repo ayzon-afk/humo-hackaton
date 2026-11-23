@@ -23,6 +23,16 @@ export const config = {
     visionModel: env.AI_VISION_MODEL || env.AI_MODEL || '',
     timeoutMs: Number(env.AI_TIMEOUT_MS) || 20000,
   },
+  agent: {
+    enabled: env.AGENT_ENABLED !== 'false',
+    reportTime: env.AGENT_REPORT_TIME || '09:00', // ежедневный отчёт, локальное время
+    timezone: env.AGENT_TZ || 'Asia/Tashkent',
+    checkMinutes: Number(env.AGENT_CHECK_MINUTES) || 15, // как часто проверять алерты
+    staleHours: Number(env.AGENT_STALE_HOURS) || 48, // «зависшая» запись без движения
+    doneStatus: env.AGENT_DONE_STATUS || 'done',
+    collection: env.AGENT_COLLECTION || (env.COLLECTIONS || 'items').split(',')[0].trim(),
+    telegram: { token: env.TELEGRAM_BOT_TOKEN || '', chatId: env.TELEGRAM_CHAT_ID || '' },
+  },
   paths: {
     dataFile: env.DATA_FILE || path.join(serverRoot, 'data', 'db.json'),
     uploadsDir: path.join(serverRoot, 'uploads'),
